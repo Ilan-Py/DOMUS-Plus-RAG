@@ -1,0 +1,15 @@
+{
+  "name": "rag-vacunas",
+  "version": "1.0.0",
+  "description": "RAG sobre vacunación humana y de mascotas — UDI III Exposición Final",
+  "type": "module",
+  "scripts": {
+    "setup": "node --env-file=.env crear-tabla.mjs",
+    "indexar": "node --env-file=.env indexar.mjs",
+    "preguntar": "node --env-file=.env preguntar.mjs",
+    "start": "node --env-file=.env servidor.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.12.0"
+  }
+}

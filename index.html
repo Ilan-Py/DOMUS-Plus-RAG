@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DOMUS+ · Consultor de Vacunas</title>
+  <style>
+    /* ── Reset & tokens ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:       #2D6A4F;   /* verde oscuro DOMUS+ */
+      --brand-light: #52B788;   /* verde medio */
+      --brand-pale:  #D8F3DC;   /* verde muy claro */
+      --accent:      #1B4332;   /* verde más oscuro (hover) */
+      --text:        #1A1A2E;
+      --text-muted:  #5A6478;
+      --bg:          #F7FAF8;
+      --surface:     #FFFFFF;
+      --border:      #D1E8DB;
+      --radius:      12px;
+      --shadow:      0 2px 12px rgba(45,106,79,.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────── */
+    header {
+      background: var(--brand);
+      color: #fff;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 64px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    }
+
+    .logo-mark {
+      width: 36px; height: 36px;
+      background: var(--brand-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 900; color: #fff;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: .3px;
+    }
+    header h1 span {
+      font-weight: 400;
+      opacity: .75;
+      font-size: .9rem;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      max-width: 760px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Intro ───────────────────────────────────────────────────── */
+    .intro {
+      background: var(--brand-pale);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      font-size: .93rem;
+      color: var(--brand);
+      line-height: 1.55;
+    }
+    .intro strong { font-weight: 700; }
+
+    /* ── Sugerencias ─────────────────────────────────────────────── */
+    .sugerencias-label {
+      font-size: .78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: .82rem;
+      color: var(--brand);
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+    }
+    .chip:hover {
+      background: var(--brand-pale);
+      border-color: var(--brand-light);
+    }
+
+    /* ── Campo de pregunta ───────────────────────────────────────── */
+    .search-box {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .search-box:focus-within {
+      border-color: var(--brand-light);
+    }
+
+    textarea {
+      width: 100%;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 16px;
+      font-size: 1rem;
+      font-family: inherit;
+      color: var(--text);
+      background: transparent;
+      min-height: 90px;
+    }
+
+    .search-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      background: #FAFCFB;
+    }
+
+    .hint { font-size: .78rem; color: var(--text-muted); }
+
+    button#btn-enviar {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 22px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    button#btn-enviar:hover  { background: var(--accent); }
+    button#btn-enviar:disabled { opacity: .55; cursor: not-allowed; }
+
+    /* ── Spinner ─────────────────────────────────────────────────── */
+    .spinner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      color: var(--brand);
+      font-size: .9rem;
+    }
+    .spinner.visible { display: flex; }
+
+    .spin-ring {
+      width: 20px; height: 20px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Resultado ───────────────────────────────────────────────── */
+    #resultado { display: none; flex-direction: column; gap: 12px; }
+    #resultado.visible { display: flex; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: var(--brand);
+      color: #fff;
+      padding: 11px 18px;
+      font-size: .82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .card-body {
+      padding: 18px 20px;
+      line-height: 1.65;
+      font-size: .97rem;
+      white-space: pre-wrap;
+    }
+
+    /* ── Fuentes ─────────────────────────────────────────────────── */
+    .fuentes-lista { display: flex; flex-direction: column; gap: 6px; }
+
+    .fuente-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: .85rem;
+    }
+
+    .fuente-num {
+      background: var(--brand-light);
+      color: #fff;
+      border-radius: 50%;
+      width: 20px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .fuente-txt { color: var(--text); line-height: 1.4; }
+    .fuente-origen { font-weight: 600; color: var(--brand); }
+    .fuente-seccion { color: var(--text-muted); }
+    .fuente-dist {
+      margin-left: auto;
+      font-size: .75rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      padding-left: 8px;
+    }
+
+    /* ── Error ───────────────────────────────────────────────────── */
+    .error-banner {
+      display: none;
+      background: #FFF5F5;
+      border: 1px solid #FFCDD2;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      color: #C62828;
+      font-size: .9rem;
+    }
+    .error-banner.visible { display: block; }
+
+    /* ── Footer ──────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 16px;
+      font-size: .78rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    footer a { color: var(--brand); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark">D+</div>
+  <h1>DOMUS+ &nbsp;<span>Consultor de Vacunas</span></h1>
+</header>
+
+<main>
+
+  <div class="intro">
+    <strong>¿Qué querés saber sobre vacunas?</strong><br>
+    Podés preguntar sobre el Calendario Nacional de Vacunación de Argentina,
+    vacunas específicas para bebés, niños, adultos y personas mayores,
+    o sobre la vacunación de <strong>perros y gatos</strong>.
+    Las respuestas se generan con IA a partir de fuentes oficiales.
+  </div>
+
+  <!-- Sugerencias -->
+  <div>
+    <p class="sugerencias-label">Preguntas frecuentes</p>
+    <div class="chips" id="chips">
+      <button class="chip">¿Cuándo se aplica la vacuna BCG?</button>
+      <button class="chip">¿Qué vacunas necesita mi perro?</button>
+      <button class="chip">¿La vacuna contra el HPV es obligatoria?</button>
+      <button class="chip">¿Cuántas dosis tiene la vacuna contra la hepatitis B?</button>
+      <button class="chip">¿Qué vacunas necesita un gato?</button>
+      <button class="chip">¿Qué es la vacuna quíntuple?</button>
+    </div>
+  </div>
+
+  <!-- Campo de pregunta -->
+  <div class="search-box">
+    <textarea
+      id="pregunta"
+      placeholder="Escribí tu pregunta sobre vacunación..."
+      rows="3"
+    ></textarea>
+    <div class="search-footer">
+      <span class="hint">La clave de API permanece en el servidor — nunca se expone al navegador.</span>
+      <button id="btn-enviar" onclick="consultar()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Consultar
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner -->
+  <div class="spinner" id="spinner">
+    <div class="spin-ring"></div>
+    Buscando en la base de conocimiento...
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner" id="error"></div>
+
+  <!-- Resultado -->
+  <div id="resultado">
+    <div class="card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Respuesta
+      </div>
+      <div class="card-body" id="respuesta-texto"></div>
+    </div>
+
+    <div class="card" id="fuentes-card">
+      <div class="card-header">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/>
+          <path d="M8 7h8M8 11h8M8 15h5"/>
+        </svg>
+        Fuentes consultadas
+      </div>
+      <div class="card-body" id="fuentes-lista"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  DOMUS+ · Prácticas Profesionalizantes II · IES Santa Fe
+  &nbsp;|&nbsp; La información es orientativa. Consultá a tu profesional de salud o veterinario.
+</footer>
+
+<script>
+  // Chips → llenar textarea
+  document.getElementById("chips").querySelectorAll(".chip").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      document.getElementById("pregunta").value = chip.textContent.trim();
+      document.getElementById("pregunta").focus();
+    });
+  });
+
+  // Enter (sin Shift) = enviar
+  document.getElementById("pregunta").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      consultar();
+    }
+  });
+
+  async function consultar() {
+    const pregunta = document.getElementById("pregunta").value.trim();
+    if (!pregunta) return;
+
+    // Limpiar estado anterior
+    setEstado("cargando");
+
+    try {
+      const resp = await fetch("/preguntar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pregunta }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json();
+        throw new Error(err.error || `Error ${resp.status}`);
+      }
+
+      const { respuesta, fuentes } = await resp.json();
+      mostrarResultado(respuesta, fuentes);
+    } catch (err) {
+      setEstado("error", err.message);
+    }
+  }
+
+  function setEstado(estado, msg = "") {
+    document.getElementById("spinner").classList.toggle("visible", estado === "cargando");
+    document.getElementById("btn-enviar").disabled = estado === "cargando";
+    document.getElementById("resultado").classList.toggle("visible", false);
+    const errEl = document.getElementById("error");
+    errEl.classList.toggle("visible", estado === "error");
+    if (estado === "error") errEl.textContent = "⚠️ " + msg;
+  }
+
+  function mostrarResultado(respuesta, fuentes) {
+    document.getElementById("respuesta-texto").textContent = respuesta;
+
+    const listaEl = document.getElementById("fuentes-lista");
+    listaEl.innerHTML = "";
+    document.getElementById("fuentes-card").style.display =
+      fuentes.length ? "block" : "none";
+
+    if (fuentes.length) {
+      const ul = document.createElement("div");
+      ul.className = "fuentes-lista";
+      fuentes.forEach((f, i) => {
+        const item = document.createElement("div");
+        item.className = "fuente-item";
+
+        const dist = typeof f.distancia === "number"
+          ? (1 - f.distancia / 2).toFixed(2)   // convertir distancia coseno a similitud aprox
+          : null;
+
+        item.innerHTML = `
+          <div class="fuente-num">${i + 1}</div>
+          <div class="fuente-txt">
+            <span class="fuente-origen">${esc(f.fuente ?? "")}</span>
+            ${f.seccion ? `<br><span class="fuente-seccion">${esc(f.seccion)}</span>` : ""}
+          </div>
+          ${dist !== null ? `<span class="fuente-dist">sim. ${dist}</span>` : ""}
+        `;
+        ul.appendChild(item);
+      });
+      listaEl.appendChild(ul);
+    }
+
+    document.getElementById("spinner").classList.remove("visible");
+    document.getElementById("btn-enviar").disabled = false;
+    document.getElementById("error").classList.remove("visible");
+    document.getElementById("resultado").classList.add("visible");
+
+    // Scroll suave al resultado
+    document.getElementById("resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function esc(str) {
+    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+</script>
+</body>
+</html>

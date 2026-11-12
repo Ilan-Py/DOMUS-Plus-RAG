@@ -18,7 +18,7 @@ export async function embedding(texto) {
     const resp = await fetch(OLLAMA_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model: "nomic-embed-text", prompt: texto }),
+      body: JSON.stringify({ model: "nomic-embed-text", prompt: texto, keep_alive: "30m" }),
       signal: controller.signal,
     });
 
@@ -48,7 +48,7 @@ export async function responder(prompt) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.2, maxOutputTokens: 1024 },
+      generationConfig: { temperature: 0.2, maxOutputTokens: 2048 },
     }),
   });
 

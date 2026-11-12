@@ -216,8 +216,11 @@
       padding: 18px 20px;
       line-height: 1.65;
       font-size: .97rem;
-      white-space: pre-wrap;
     }
+    .card-body p { margin-bottom: 10px; }
+    .card-body ul, .card-body ol { padding-left: 20px; margin-bottom: 10px; }
+    .card-body li { margin-bottom: 4px; }
+    .card-body strong { color: var(--brand); }
 
     /* ── Fuentes ─────────────────────────────────────────────────── */
     .fuentes-lista { display: flex; flex-direction: column; gap: 6px; }
@@ -420,7 +423,7 @@
   }
 
   function mostrarResultado(respuesta, fuentes) {
-    document.getElementById("respuesta-texto").textContent = respuesta;
+    document.getElementById("respuesta-texto").innerHTML = marked.parse(respuesta);
 
     const listaEl = document.getElementById("fuentes-lista");
     listaEl.innerHTML = "";
@@ -464,5 +467,6 @@
     return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   }
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </body>
 </html>

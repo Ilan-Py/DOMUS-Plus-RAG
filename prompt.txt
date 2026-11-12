@@ -17,4 +17,4 @@ Contexto:
 
 Pregunta: {{pregunta}}
 
-Respuesta (incluí las fuentes al final bajo el título "📚 Fuentes consultadas:"):
+Respuesta:

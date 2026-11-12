@@ -2,7 +2,7 @@
 
 const OLLAMA_URL = "http://localhost:11434/api/embeddings";
 const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
 
 /**
  * Genera el vector de embedding para un texto usando Ollama + bge-m3.

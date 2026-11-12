@@ -1,27 +1,37 @@
 // api.mjs — embeddings via Ollama (bge-m3) + respuestas via Google Gemini
 
-const OLLAMA_URL = "http://localhost:11434/api/embeddings";
+const OLLAMA_URL = "http://127.0.0.1:11434/api/embeddings";
+/**const GEMINI_URL =
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";*/
 const GEMINI_URL =
-  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent";
+  "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent";
 
 /**
  * Genera el vector de embedding para un texto usando Ollama + bge-m3.
  * Dimensión de salida: 1024 (coincide con la columna VECTOR(1024) en Postgres).
  */
 export async function embedding(texto) {
-  const resp = await fetch(OLLAMA_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "bge-m3", prompt: texto }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 300000); // 5 min
 
-  if (!resp.ok) {
-    const err = await resp.text();
-    throw new Error(`Ollama error ${resp.status}: ${err}`);
+  try {
+    const resp = await fetch(OLLAMA_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: "nomic-embed-text", prompt: texto }),
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) {
+      const err = await resp.text();
+      throw new Error(`Ollama error ${resp.status}: ${err}`);
+    }
+
+    const data = await resp.json();
+    return data.embedding;
+  } finally {
+    clearTimeout(timer);
   }
-
-  const data = await resp.json();
-  return data.embedding; // arreglo de 1024 números
 }
 
 /**

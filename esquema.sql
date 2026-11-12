@@ -10,7 +10,7 @@ CREATE TABLE fragmentos (
   seccion   TEXT,
   posicion  INTEGER,
   texto     TEXT,
-  embedding VECTOR(1024)
+  embedding VECTOR(768)
 );
 
 -- Índice HNSW para búsqueda rápida por distancia coseno

@@ -5,7 +5,7 @@ import { embedding } from "./api.mjs";
 
 // Umbral de similitud coseno (0 = idéntico, 2 = opuesto en distancia coseno pgvector)
 // Distancia < 0.4 → similitud alta; ajustar con la Ficha 4 de la guía
-const UMBRAL_DISTANCIA = 0.45;
+const UMBRAL_DISTANCIA = 0.55;
 const K = 4; // cantidad máxima de fragmentos a recuperar
 
 /**

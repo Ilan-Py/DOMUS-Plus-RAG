@@ -1,7 +1,11 @@
+# secretos
 .env
-C:\Users\alan\DOMUS-Plus-RAG\.claude
+
+# dependencias
 /node_modules
-C:\Users\alan\DOMUS-Plus-RAG\.claude\skills
-.claude 
+
+# skills y configuración locales de Claude Code
+.claude
+
 # copia anidada del repositorio (no es parte del proyecto)
 /DOMUS-Plus-RAG/

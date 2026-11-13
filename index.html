@@ -111,12 +111,9 @@
       text-shadow: 1px 1px 2px #000, 0 0 3px #000;
     }
     .icono.sel { background: rgba(49,106,197,.75); border: 1px dotted #fff; }
-    .icono-img {
-      width: 44px; height: 44px; border-radius: 8px; border: 2px solid #000; box-shadow: 3px 3px 0 #000;
-      display: grid; place-items: center; text-shadow: none;
-    }
-    .icono-img.app { background: var(--lateral); color: #000; font: italic 800 20px/1 var(--f-display); }
-    .icono-img.info { background: #2D6CDF; color: #fff; font: 700 26px/1 Georgia, serif; }
+    .icono-img { width: 48px; height: 48px; display: grid; place-items: center; filter: drop-shadow(1px 2px 1.5px rgba(0,0,0,.6)); }
+    .icono-img svg { width: 44px; height: 44px; }
+    .icono-img.papelera.llena { --papeles: block; }
 
     /* ── Ventanas (reales) ──────────────────────────────────────── */
     .ventana {
@@ -152,7 +149,8 @@
       text-shadow: 1px 1px 0 var(--lu-sombra); cursor: var(--cursor);
     }
     .ventana.inactiva .titulo { background: linear-gradient(#7A9BEA 0%, #6F92E6 12%, #6C8EE2 50%, #7C9CEA 90%, #6580DB 100%); color: #E6ECFC; text-shadow: none; }
-    .titulo-icono { width: 18px; height: 18px; border-radius: 3px; background: var(--lateral); color: #000; display: grid; place-items: center; font: 800 13px/1 var(--f-display); text-shadow: none; flex-shrink: 0; border: 0; padding: 0; }
+    .titulo-icono { width: 18px; height: 18px; background: none; border: 0; padding: 0; display: grid; place-items: center; flex-shrink: 0; }
+    .titulo-icono svg { width: 18px; height: 18px; filter: drop-shadow(0 1px 0 rgba(0,0,0,.35)); }
     .titulo-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .rayas { flex: 1; height: 11px; min-width: 20px; background: repeating-linear-gradient(#fff 0 1px, transparent 1px 3px); opacity: .45; }
     .btn-ventana {
@@ -193,7 +191,11 @@
       color: var(--enlace); font: 700 13px/1.2 var(--f-ui);
       padding: 7px 10px; display: flex; justify-content: space-between; align-items: center;
     }
-    .grupo h2::after { content: "⌃"; font-size: 12px; opacity: .7; }
+    .grupo h2::after {
+      content: ""; width: 18px; height: 18px; flex: none; border-radius: 50%;
+      border: 1px solid #9CB0E8; box-shadow: inset 0 0 2px rgba(255,255,255,.9);
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 11.2l4-4 4 4M5 8l4-4 4 4' fill='none' stroke='%231A47A0' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% no-repeat;
+    }
     .grupo-cuerpo { background: var(--tarea); padding: 8px 10px 10px; }
 
     .secuencia { list-style: none; position: relative; padding-left: 4px; }
@@ -314,10 +316,7 @@
     .dialogo { width: min(400px, calc(100vw - 24px)); }
     .dialogo-cuerpo { display: flex; gap: 14px; align-items: flex-start; padding: 20px 20px 12px; background: var(--beige); }
     .dialogo-cuerpo p { white-space: pre-wrap; font-size: .93rem; overflow-wrap: anywhere; }
-    .dlg-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 2px #000; font: 800 24px/1 Georgia, serif; }
-    .dlg-ico.info { background: #2D6CDF; }
-    .dlg-ico.error { background: #D9361B; font-family: var(--f-ui); }
-    .dlg-ico.alerta { background: #F0B400; color: #000; font-family: var(--f-ui); }
+    .dlg-ico { flex: none; width: 42px; height: 42px; filter: drop-shadow(1px 2px 1px rgba(0,0,0,.4)); }
     .dialogo-pie { display: flex; justify-content: center; padding: 8px 20px 18px; background: var(--beige); }
     .btn-xp {
       min-width: 92px; padding: 5px 16px; cursor: pointer; font: .9rem var(--f-ui); color: #000;
@@ -330,19 +329,11 @@
     .btn-xp:disabled { color: #ACA899; border-color: #C9C7BA; background: #F4F3EE; box-shadow: none; }
     /* botón predeterminado: resplandor azul; el de Preguntar lleva el cuadrito verde "Ir" de XP */
     .btn-xp.principal {
-      display: inline-flex; align-items: center; gap: 9px; padding: 5px 20px 5px 8px;
+      display: inline-flex; align-items: center; gap: 9px; padding: 6px 26px;
       font: 700 .98rem var(--f-ui); box-shadow: inset 0 0 0 2px #98B8F8;
     }
     .btn-xp.principal:hover:not(:disabled) { box-shadow: inset 0 0 0 2px #FFC83C; }
     .btn-xp.principal:active:not(:disabled) { box-shadow: inset 1px 1px 3px rgba(0,0,0,.3), inset 0 0 0 2px #98B8F8; }
-    .btn-xp .ir {
-      width: 22px; height: 22px; flex: none; display: grid; place-items: center; color: #fff;
-      border: 1px solid #1F6F1F; border-radius: 4px;
-      background: linear-gradient(#7BE07B, #34A334 55%, #2A8A2A);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
-    }
-    .btn-xp .ir svg { width: 14px; height: 14px; }
-    .btn-xp:disabled .ir { filter: grayscale(1) opacity(.6); }
 
     /* ── Dosi (asistente) ───────────────────────────────────────── */
     .asistente {
@@ -370,7 +361,7 @@
     .globo-x:hover { background: var(--rosa); }
     .globo-cuerpo { max-height: min(46vh, 360px); overflow-y: auto; padding-right: 26px; }
     .globo-texto { white-space: pre-wrap; overflow-wrap: anywhere; }
-    .globo-fin { display: none; position: absolute; right: 12px; bottom: 3px; font-size: .75rem; color: #C2183C; animation: titilar 1s steps(2) infinite; }
+    .globo-fin { display: none; position: absolute; right: 14px; bottom: 8px; width: 0; height: 0; border: 6px solid transparent; border-top: 9px solid #C2183C; border-bottom: 0; animation: titilar 1s steps(2) infinite; }
     .globo.listo .globo-fin { display: block; }
     @keyframes titilar { 50% { opacity: 0; } }
 
@@ -439,7 +430,8 @@
       color: #fff; font: italic 800 1.15rem/1 var(--f-display); text-shadow: 1px 2px 2px rgba(0,0,0,.5);
     }
     .inicio:hover { filter: brightness(1.1); }
-    .inicio-ico { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #2D7C2F; display: grid; place-items: center; font: 800 15px/1 var(--f-display); text-shadow: none; }
+    .inicio-ico { width: 26px; height: 26px; display: grid; place-items: center; }
+    .inicio-ico svg { width: 26px; height: 26px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,.55)); }
     .tareas-abiertas { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; padding-left: 6px; }
     .tarea-btn {
       display: flex; align-items: center; gap: 8px; width: 100%; max-width: 220px; min-width: 0; height: 30px; padding: 0 10px;
@@ -452,7 +444,7 @@
     .tarea-btn.aviso { animation: avisar 1s steps(2) infinite; }
     @keyframes avisar { 50% { background: #F7A21B; color: #000; } }
     .tarea-btn[hidden] { display: none; }
-    .tarea-btn .tarea-ico { width: 16px; height: 16px; border-radius: 3px; background: var(--lateral); color: #000; display: grid; place-items: center; font: 800 11px/1 var(--f-display); flex: none; }
+    .tarea-btn .tarea-ico { width: 16px; height: 16px; flex: none; filter: drop-shadow(0 1px 0 rgba(0,0,0,.35)); }
     .tarea-btn .tarea-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .bandeja {
       margin-left: auto; display: flex; align-items: center; gap: 12px; padding: 0 14px; flex: none;
@@ -627,9 +619,7 @@
     .aviso-bandeja::before { content: ""; position: absolute; right: 26px; bottom: -17px; border: 9px solid transparent; border-top: 15px solid #000; border-bottom: 0; }
     .aviso-bandeja::after { content: ""; position: absolute; right: 29px; bottom: -11px; border: 6px solid transparent; border-top: 11px solid var(--globo); border-bottom: 0; }
     .av-cab { display: flex; align-items: center; gap: 8px; font: 700 .88rem var(--f-ui); padding-right: 22px; }
-    .av-ico { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 12px/1 Georgia, serif; flex: none; }
-    .av-ico.info { background: #2D6CDF; }
-    .av-ico.error { background: #D9361B; font-family: var(--f-ui); }
+    .av-ico { width: 22px; height: 22px; flex: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.35)); }
     .av-txt { margin-top: 4px; font-size: .85rem; line-height: 1.4; }
     .av-x { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: #fff; border: 1.5px solid #000; border-radius: 3px; font: 700 13px/1 var(--f-ui); display: grid; place-items: center; }
     .av-x:hover { background: var(--rosa); }
@@ -689,13 +679,8 @@
     .menu-pie-btn:hover, .menu-pie-btn:focus-visible { background: rgba(255,255,255,.22); }
     .mp-ico { width: 20px; height: 20px; border-radius: 3px; background: #E8832C; border: 1px solid #fff; display: grid; place-items: center; }
     .mp-ico svg { width: 12px; height: 12px; }
-    .dlg-ico.pregunta { background: #2D6CDF; }
 
     /* ── Papelera de reciclaje (ícono + ventana) ────────────────── */
-    .icono-img.papelera { background: #D6E6FA; }
-    .icono-img.papelera svg { width: 30px; height: 30px; }
-    .icono-img.papelera .papeles { display: none; }
-    .icono-img.papelera.llena .papeles { display: block; }
     .papelera-win { width: min(540px, calc(100vw - 24px)); }
     .pap-cuerpo { background: var(--beige); padding: 8px 10px 6px; }
     .pap-barra { display: flex; gap: 8px; margin-bottom: 8px; }
@@ -731,6 +716,10 @@
     .opciones.horizontal { grid-template-columns: repeat(3, 1fr); }
     .prop-cuerpo .btn-xp.vista-previa { justify-self: start; margin-top: 6px; }
 
+    /* ── Íconos en los ítems del menú Inicio (como en XP) ───────── */
+    .menu-item { display: flex; align-items: center; gap: 9px; }
+    .menu-item .mi { width: 22px; height: 22px; flex: none; filter: drop-shadow(0 1px 1px rgba(0,0,0,.3)); }
+
     /* ── Móvil ──────────────────────────────────────────────────── */
     @media (max-width: 760px) {
       :root { --lado-w: 0px; }
@@ -756,6 +745,104 @@
   </style>
 </head>
 <body>
+
+<!-- Íconos estilo Windows XP (degradados + brillo), definidos una vez y reutilizados con <use> -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="gAzul" cx=".35" cy=".28" r=".85"><stop offset="0" stop-color="#B4D6FF"/><stop offset=".5" stop-color="#3B7BE8"/><stop offset="1" stop-color="#123C9E"/></radialGradient>
+    <radialGradient id="gRojo" cx=".35" cy=".28" r=".85"><stop offset="0" stop-color="#FFC0AE"/><stop offset=".5" stop-color="#E8452A"/><stop offset="1" stop-color="#8F1A07"/></radialGradient>
+    <linearGradient id="gAmar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFF59A"/><stop offset=".55" stop-color="#F7C600"/><stop offset="1" stop-color="#C79300"/></linearGradient>
+    <linearGradient id="gVerde" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8CF28C"/><stop offset=".55" stop-color="#2FB02F"/><stop offset="1" stop-color="#1C7A1C"/></linearGradient>
+    <linearGradient id="gBarril" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#DCEBFA"/><stop offset=".45" stop-color="#FFFFFF"/><stop offset="1" stop-color="#B3CBE6"/></linearGradient>
+    <linearGradient id="gMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6F9FC"/><stop offset="1" stop-color="#A9BBCF"/></linearGradient>
+    <linearGradient id="gCielo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3F8CF0"/><stop offset="1" stop-color="#CFE8FF"/></linearGradient>
+  </defs>
+
+  <symbol id="ico-info" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13.6" fill="url(#gAzul)" stroke="#0B2D86" stroke-width="1.2"/>
+    <ellipse cx="13.5" cy="9" rx="8.5" ry="5" fill="#fff" opacity=".38"/>
+    <circle cx="16" cy="9.6" r="2.3" fill="#fff"/><path d="M13.4 13.4h4.2V23h-4.2z" fill="#fff"/>
+  </symbol>
+
+  <symbol id="ico-error" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13.6" fill="url(#gRojo)" stroke="#7A1203" stroke-width="1.2"/>
+    <ellipse cx="13.5" cy="9" rx="8.5" ry="5" fill="#fff" opacity=".38"/>
+    <path d="M10.6 10.6l10.8 10.8M21.4 10.6L10.6 21.4" stroke="#fff" stroke-width="3.6" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="ico-alerta" viewBox="0 0 32 32">
+    <path d="M16 3.2L30 27.6H2z" fill="url(#gAmar)" stroke="#8A6400" stroke-width="1.6" stroke-linejoin="round"/>
+    <path d="M16 6.8l-8.4 14.6c2.6-2.6 9.8-3.4 16.8-.8z" fill="#fff" opacity=".35"/>
+    <path d="M14.2 11.2h3.6l-.8 9.4h-2z" fill="#4A3500"/><circle cx="16" cy="23.6" r="1.8" fill="#4A3500"/>
+  </symbol>
+
+  <symbol id="ico-pregunta" viewBox="0 0 32 32">
+    <circle cx="16" cy="16" r="13.6" fill="url(#gAzul)" stroke="#0B2D86" stroke-width="1.2"/>
+    <ellipse cx="13.5" cy="9" rx="8.5" ry="5" fill="#fff" opacity=".38"/>
+    <path d="M11.8 12.2c0-2.8 2.1-4.4 4.5-4.4 2.4 0 4.2 1.5 4.2 3.7 0 3-3.7 3.1-3.7 6.1" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+    <circle cx="16.8" cy="23.2" r="1.9" fill="#fff"/>
+  </symbol>
+
+  <symbol id="ico-dosi" viewBox="0 0 32 32">
+    <g stroke="#0F2A5C" stroke-width="1.1" stroke-linejoin="round">
+      <rect x="10.5" y="1.6" width="11" height="3.4" rx="1.7" fill="#FF6B86"/>
+      <rect x="15" y="5" width="2" height="4.4" fill="#9DB3C8"/>
+      <rect x="7.5" y="9" width="17" height="3" rx="1.5" fill="#fff"/>
+      <rect x="10.5" y="9.6" width="11" height="16" rx="2.4" fill="url(#gBarril)"/>
+      <rect x="11.6" y="15.5" width="8.8" height="9.2" rx="1.6" fill="url(#gVerde)" stroke="none"/>
+      <path d="M12.6 25.6h6.8l-1.2 3.2h-4.4z" fill="#9DB3C8"/>
+      <path d="M15.4 28.6h1.2v2.4l-.6 1.1-.6-1.1z" fill="#E1E9F1"/>
+    </g>
+    <rect x="12.1" y="11" width="1.7" height="13" rx=".85" fill="#fff" opacity=".75"/>
+    <circle cx="14.4" cy="19.3" r=".95" fill="#0F2A5C"/><circle cx="17.6" cy="19.3" r=".95" fill="#0F2A5C"/>
+    <path d="M14.5 21.3q1.5 1.3 3 0" fill="none" stroke="#0F2A5C" stroke-width=".9" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="ico-papelera" viewBox="0 0 32 32">
+    <g style="display:var(--papeles,none)" stroke="#6B7F93" stroke-width="1" stroke-linejoin="round">
+      <path d="M9.5 8.5l3-5.5 7.5 2-2.5 5.5z" fill="#fff"/><path d="M15.5 8l6-3.5 4.2 4.8-3.2 3.6z" fill="#FFF28A"/>
+    </g>
+    <g stroke="#4A6078" stroke-width="1.1" stroke-linejoin="round">
+      <path d="M6 9.5h20l-2 19.5H8z" fill="url(#gMetal)"/>
+      <rect x="4.5" y="6.6" width="23" height="3.6" rx="1.6" fill="#D6E2EE"/>
+    </g>
+    <path d="M11 13v13M16 13v13M21 13v13" stroke="#8CA2B8" stroke-width="1" fill="none"/>
+    <path d="M21.2 21.6a5 5 0 1 1-1.4-4.1" fill="none" stroke="#2FB02F" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M22.4 15.4v4.4h-4.4z" fill="#2FB02F"/>
+  </symbol>
+
+  <symbol id="ico-tareas" viewBox="0 0 32 32">
+    <rect x="3" y="4.5" width="26" height="18.5" rx="2.2" fill="url(#gMetal)" stroke="#4A6078" stroke-width="1.1"/>
+    <rect x="5.6" y="7" width="20.8" height="13.5" rx="1" fill="#0B1F3A"/>
+    <path d="M7 17.4l4-4.2 3 3 4.2-6.4 3 4.2 4.2-5.2" fill="none" stroke="#4DFF7A" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M12.2 23h7.6l1.6 4H10.6z" fill="#B9C8D8" stroke="#4A6078" stroke-width="1"/>
+    <rect x="8.5" y="27" width="15" height="2.2" rx="1.1" fill="#8CA2B8" stroke="#4A6078" stroke-width=".8"/>
+  </symbol>
+
+  <symbol id="ico-pantalla" viewBox="0 0 32 32">
+    <rect x="3" y="4.5" width="26" height="18.5" rx="2.2" fill="url(#gMetal)" stroke="#4A6078" stroke-width="1.1"/>
+    <rect x="5.6" y="7" width="20.8" height="13.5" rx="1" fill="url(#gCielo)"/>
+    <path d="M5.6 17.6c4-4.6 9.2-5.2 13.4-2.4 3 2 5.4 1.4 7.4.2v5.1H5.6z" fill="url(#gVerde)"/>
+    <circle cx="22" cy="10.6" r="1.9" fill="#FFF28A"/>
+    <path d="M12.2 23h7.6l1.6 4H10.6z" fill="#B9C8D8" stroke="#4A6078" stroke-width="1"/>
+    <rect x="8.5" y="27" width="15" height="2.2" rx="1.1" fill="#8CA2B8" stroke="#4A6078" stroke-width=".8"/>
+  </symbol>
+
+  <symbol id="ico-sonido" viewBox="0 0 32 32">
+    <path d="M4.5 12h5.5l7.5-6.5v21L10 20H4.5z" fill="url(#gMetal)" stroke="#4A6078" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M21.5 11.2c2.2 2.8 2.2 6.8 0 9.6M24.6 8c3.9 4.7 3.9 11.3 0 16" fill="none" stroke="#2F6FE0" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="ico-inicio" viewBox="0 0 32 32">
+    <g transform="rotate(-7 16 16)">
+      <rect x="12" y="2.5" width="8.4" height="9" rx="2" fill="#FF5C7C"/>
+      <rect x="20.6" y="12" width="9" height="8.4" rx="2" fill="#3EE06A"/>
+      <rect x="11.6" y="20.6" width="8.4" height="9" rx="2" fill="#00BFFF"/>
+      <rect x="2.4" y="11.6" width="9" height="8.4" rx="2" fill="#FFF200"/>
+      <rect x="12.6" y="12.6" width="6.8" height="6.8" rx="1.6" fill="#fff"/>
+    </g>
+  </symbol>
+</svg>
 
 <!-- Pantalla de bienvenida (también desbloquea el audio del navegador) -->
 <div class="bienvenida" id="bienvenida">
@@ -806,16 +893,16 @@
 </header>
 
 <nav class="iconos" aria-label="Escritorio">
-  <button class="icono" type="button" data-abrir="app"><span class="icono-img app" aria-hidden="true">D+</span>Consultor de vacunas</button>
-  <button class="icono" type="button" data-abrir="acerca"><span class="icono-img info" aria-hidden="true">i</span>Acerca de DOMUS+</button>
-  <button class="icono" type="button" data-abrir="papelera"><span class="icono-img papelera" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><g class="papeles"><path d="M10 10l3-7 7 2-3 6" fill="#fff"/><path d="M15 9l6-4 4 5-3 4" fill="#FFF200"/></g><path d="M7 11h18l-2 17H9z" fill="#9DB3C4"/><path d="M5 11h22"/><path d="M12 15v9M16 15v9M20 15v9"/></svg></span>Papelera de reciclaje</button>
+  <button class="icono" type="button" data-abrir="app"><span class="icono-img" aria-hidden="true"><svg class="" aria-hidden="true"><use href="#ico-dosi"/></svg></span>Consultor de vacunas</button>
+  <button class="icono" type="button" data-abrir="acerca"><span class="icono-img" aria-hidden="true"><svg class="" aria-hidden="true"><use href="#ico-info"/></svg></span>Acerca de DOMUS+</button>
+  <button class="icono" type="button" data-abrir="papelera"><span class="icono-img papelera" aria-hidden="true"><svg class="" aria-hidden="true"><use href="#ico-papelera"/></svg></span>Papelera de reciclaje</button>
 </nav>
 
 <main>
   <!-- Ventana principal -->
   <section class="ventana app inactiva" id="v-app" aria-label="DOMUS+ Consultor de vacunas">
     <div class="titulo">
-      <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+      <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu"><svg class="" aria-hidden="true"><use href="#ico-dosi"/></svg></button>
       <span class="titulo-txt">DOMUS+ · Consultor de vacunas</span>
       <span class="rayas" aria-hidden="true"></span>
       <button class="btn-ventana" type="button" data-accion="min" aria-label="Minimizar"><svg viewBox="0 0 12 12"><rect x="1" y="8" width="7" height="3" fill="#fff"/></svg></button>
@@ -881,7 +968,6 @@
             <div class="campo-pie">
               <span class="ayuda">Enter para enviar · Shift + Enter para salto de línea</span>
               <button class="btn-xp principal" id="btn-enviar" type="button">
-                <span class="ir" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
                 Preguntar
               </button>
             </div>
@@ -917,7 +1003,7 @@
       <p class="globo-texto" id="globo-texto" aria-hidden="true"></p>
       <div class="carga" aria-hidden="true"><i></i></div>
     </div>
-    <span class="globo-fin" aria-hidden="true">▼</span>
+    <span class="globo-fin" aria-hidden="true"></span>
   </div>
 
   <button class="dosi" id="dosi" type="button" aria-label="Tocá a Dosi para que hable. Arrastralo, o usá las flechas, para moverlo">
@@ -994,8 +1080,8 @@
   <div class="menu-cols">
     <div>
       <h3>Programas</h3>
-      <button class="menu-item fuerte" type="button" data-abrir="app">Consultor de vacunas</button>
-      <button class="menu-item" type="button" data-abrir="tareas">Administrador de tareas</button>
+      <button class="menu-item fuerte" type="button" data-abrir="app"><svg class="mi" aria-hidden="true"><use href="#ico-dosi"/></svg>Consultor de vacunas</button>
+      <button class="menu-item" type="button" data-abrir="tareas"><svg class="mi" aria-hidden="true"><use href="#ico-tareas"/></svg>Administrador de tareas</button>
       <h3>Preguntas frecuentes</h3>
       <button class="menu-item" type="button" data-q="¿Cuándo se aplica la vacuna BCG?">¿Cuándo se aplica la vacuna BCG?</button>
       <button class="menu-item" type="button" data-q="¿La vacuna contra el HPV es obligatoria?">¿La vacuna contra el HPV es obligatoria?</button>
@@ -1004,10 +1090,10 @@
     </div>
     <div>
       <h3>Dosi</h3>
-      <button class="menu-item" type="button" data-abrir="papelera">Papelera de reciclaje</button>
-      <button class="menu-item" type="button" id="menu-sonido">Sonido: activado</button>
-      <button class="menu-item" type="button" id="menu-prop">Propiedades de pantalla</button>
-      <button class="menu-item" type="button" data-abrir="acerca">Acerca de DOMUS+</button>
+      <button class="menu-item" type="button" data-abrir="papelera"><svg class="mi" aria-hidden="true"><use href="#ico-papelera"/></svg>Papelera de reciclaje</button>
+      <button class="menu-item" type="button" id="menu-sonido"><svg class="mi" aria-hidden="true"><use href="#ico-sonido"/></svg><span id="menu-sonido-txt">Sonido: activado</span></button>
+      <button class="menu-item" type="button" id="menu-prop"><svg class="mi" aria-hidden="true"><use href="#ico-pantalla"/></svg>Propiedades de pantalla</button>
+      <button class="menu-item" type="button" data-abrir="acerca"><svg class="mi" aria-hidden="true"><use href="#ico-info"/></svg>Acerca de DOMUS+</button>
     </div>
   </div>
   <div class="menu-pie"><button class="menu-pie-btn" type="button" id="menu-logoff"><span class="mp-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5v16h4M15 8l5 4-5 4M20 12H9"/></svg></span>Cerrar sesión</button></div>
@@ -1016,7 +1102,7 @@
 <!-- Barra de tareas -->
 <div class="barra-tareas">
   <button class="inicio" id="btn-inicio" type="button" aria-expanded="false" aria-controls="menu-inicio">
-    <span class="inicio-ico" aria-hidden="true">+</span>inicio
+    <span class="inicio-ico" aria-hidden="true"><svg class="" aria-hidden="true"><use href="#ico-inicio"/></svg></span>inicio
   </button>
   <div class="tareas-abiertas" id="tareas-abiertas"></div>
   <div class="bandeja">
@@ -1036,7 +1122,7 @@
 <!-- Globo de la bandeja -->
 <div class="aviso-bandeja" id="aviso" role="status" hidden>
   <button class="av-x" id="av-x" type="button" aria-label="Cerrar aviso">×</button>
-  <div class="av-cab"><span class="av-ico info" id="av-ico" aria-hidden="true">i</span><span id="av-titulo"></span></div>
+  <div class="av-cab"><svg class="av-ico" id="av-ico" aria-hidden="true"><use href="#ico-info"/></svg><span id="av-titulo"></span></div>
   <p class="av-txt" id="av-txt"></p>
 </div>
 
@@ -1189,7 +1275,7 @@ Presione cualquier tecla para continuar _</pre>
 
   function pintarSonido() {
     $("btn-sonido").setAttribute("aria-pressed", String(sonido));
-    $("menu-sonido").textContent = sonido ? "Sonido: activado" : "Sonido: silencio";
+    $("menu-sonido-txt").textContent = sonido ? "Sonido: activado" : "Sonido: silencio";
   }
   function alternarSonido() {
     sonido = !sonido;
@@ -1270,7 +1356,7 @@ Presione cualquier tecla para continuar _</pre>
     const b = document.createElement("button");
     b.type = "button";
     b.className = "tarea-btn";
-    b.innerHTML = `<span class="tarea-ico" aria-hidden="true">+</span><span class="tarea-txt"></span>`;
+    b.innerHTML = `<svg class="tarea-ico" aria-hidden="true"><use href="#ico-dosi"/></svg><span class="tarea-txt"></span>`;
     b.querySelector(".tarea-txt").textContent = v.o.titulo;
     b.setAttribute("aria-label", v.o.titulo);
     b.addEventListener("click", () => {
@@ -1464,7 +1550,6 @@ Presione cualquier tecla para continuar _</pre>
   })();
 
   // ── cuadros de diálogo ──
-  const ICONOS_DLG = { info: "i", error: "✕", alerta: "!", pregunta: "?" };
   const SONIDO_DLG = { info: "ding", error: "error", alerta: "exclamacion", pregunta: "ding" };
   let cascada = 0;
   function dialogo({ titulo, icono = "info", texto, botones = null }) {
@@ -1474,12 +1559,12 @@ Presione cualquier tecla para continuar _</pre>
     el.setAttribute("aria-label", titulo);
     el.innerHTML = `
       <div class="titulo">
-        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu"><svg class="" aria-hidden="true"><use href="#ico-info"/></svg></button>
         <span class="titulo-txt"></span>
         <span class="rayas" aria-hidden="true"></span>
         <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
       </div>
-      <div class="dialogo-cuerpo"><span class="dlg-ico ${icono}" aria-hidden="true">${ICONOS_DLG[icono]}</span><p></p></div>
+      <div class="dialogo-cuerpo"><svg class="dlg-ico" aria-hidden="true"><use href="#ico-${icono}"/></svg><p></p></div>
       <div class="dialogo-pie">${botones ? botones.map((b, i) => `<button class="btn-xp${b.principal ? " principal-d" : ""}" type="button" data-b="${i}"></button>`).join("") : `<button class="btn-xp" type="button" data-accion="cerrar">Aceptar</button>`}</div>`;
     el.querySelector(".titulo-txt").textContent = titulo;
     if (botones) el.querySelectorAll("[data-b]").forEach((b) => { b.textContent = botones[b.dataset.b].t; });
@@ -1956,8 +2041,7 @@ Presione cualquier tecla para continuar _</pre>
   let avisoClic = null;
   function avisar(titulo, texto, { icono = "info", alClic = null } = {}) {
     const a = $("aviso");
-    $("av-ico").className = "av-ico " + icono;
-    $("av-ico").textContent = icono === "error" ? "✕" : "i";
+    $("av-ico").querySelector("use").setAttribute("href", icono === "error" ? "#ico-error" : "#ico-info");
     $("av-titulo").textContent = titulo;
     $("av-txt").textContent = texto;
     avisoClic = alClic;
@@ -2163,7 +2247,7 @@ Presione cualquier tecla para continuar _</pre>
       `<button class="opcion" type="button" role="radio" data-grupo="${grupo}" data-id="${o.id}" aria-checked="${o.id === actual}">${o.nombre}</button>`).join("");
     el.innerHTML = `
       <div class="titulo">
-        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu"><svg class="" aria-hidden="true"><use href="#ico-pantalla"/></svg></button>
         <span class="titulo-txt">Propiedades de pantalla</span>
         <span class="rayas" aria-hidden="true"></span>
         <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
@@ -2277,7 +2361,7 @@ Presione cualquier tecla para continuar _</pre>
     el.setAttribute("aria-label", "Papelera de reciclaje");
     el.innerHTML = `
       <div class="titulo">
-        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu"><svg class="" aria-hidden="true"><use href="#ico-papelera"/></svg></button>
         <span class="titulo-txt">Papelera de reciclaje</span>
         <span class="rayas" aria-hidden="true"></span>
         <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
@@ -2377,7 +2461,7 @@ Presione cualquier tecla para continuar _</pre>
     el.setAttribute("aria-label", "Administrador de tareas");
     el.innerHTML = `
       <div class="titulo">
-        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu"><svg class="" aria-hidden="true"><use href="#ico-tareas"/></svg></button>
         <span class="titulo-txt">Administrador de tareas</span>
         <span class="rayas" aria-hidden="true"></span>
         <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>

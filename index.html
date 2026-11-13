@@ -4,395 +4,1751 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DOMUS+ · Consultor de Vacunas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- La fuente carga sin bloquear el script: sin internet se usa la de reemplazo (Arial Black) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,800&display=swap" rel="stylesheet" /></noscript>
   <style>
-    /* ── Reset & tokens ─────────────────────────────────────────── */
+    /* ── Tokens ─────────────────────────────────────────────────────
+       Escritorio Windows XP (Luna) + Y2K:
+       amarillo ácido y negro duro (Do Not Touch Your Face / Starface),
+       sombras negras planas y ventanas rayadas (Tavus),
+       sello de fecha de videocámara (Kurt Champion). */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --brand:       #2D6A4F;   /* verde oscuro DOMUS+ */
-      --brand-light: #52B788;   /* verde medio */
-      --brand-pale:  #D8F3DC;   /* verde muy claro */
-      --accent:      #1B4332;   /* verde más oscuro (hover) */
-      --text:        #1A1A2E;
-      --text-muted:  #5A6478;
-      --bg:          #F7FAF8;
-      --surface:     #FFFFFF;
-      --border:      #D1E8DB;
-      --radius:      12px;
-      --shadow:      0 2px 12px rgba(45,106,79,.12);
+      --negro:   #000;
+      --acido:   #F7F05A;
+      --lateral: #FFF200;
+      --rosa:    #FF5C7C;
+      --verde:   #3EE06A;
+      --cian:    #00BFFF;
+      --beige:   #ECE9D8;
+      --azul-osc:#0831D9;
+      --tarea:   #D6DFF7;
+      --enlace:  #1A47A0;
+      --globo:   #FFFFE1;
+      --barra-h: 40px;
+      --lado-w:  84px;
+
+      /* combinación de colores (Propiedades de pantalla) */
+      --lu-top: #0997FF; --lu-mid: #0053EE; --lu-mid2: #0050EE; --lu-bot: #003DD7;
+      --lu-txt: #fff; --lu-sombra: #0F1089;
+      --barra-a: #3168D5; --barra-b: #4993E6; --barra-c: #245EDC; --barra-d: #1941A5; --barra-borde: #5C96F0;
+      --bandeja-a: #0F9BF0; --bandeja-b: #0B6FD0; --bandeja-txt: #fff;
+
+      /* cursores estilo XP */
+      --cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M3 2v16l4.5-4 3 7 2.5-1-3-6.8H16z' fill='white' stroke='black' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2, default;
+      --mano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cpath d='M9 2c1.1 0 2 .8 2 2v6.5l1.2-.5c1-.4 2.3 0 2.6 1.2l1.4-.3c1.2-.2 2.2.6 2.3 1.8l.8-.1c1.1 0 2 .9 2 2v3.4c0 3.2-2.2 6-5.3 6h-4c-2 0-3.6-1-4.6-2.6L3.6 15.4c-.6-1 .2-2.3 1.4-2.2l2 .4V4c0-1.2 1-2 2-2z' fill='white' stroke='black' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 9 2, pointer;
+
+      --f-display: "Poppins", "Arial Black", Impact, sans-serif;
+      --f-ui: Tahoma, "Segoe UI", Verdana, sans-serif;
+      --f-mono: ui-monospace, "Cascadia Mono", "Courier New", monospace;
     }
 
+    html, body { height: 100%; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
+      font-family: var(--f-ui);
+      font-size: 15px; line-height: 1.5;
+      color: var(--negro);
+      background: #5B9BEF;
+      overflow: hidden;          /* escritorio: no se scrollea la página, sí las ventanas */
+      position: relative;
     }
+    button { font-family: inherit; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    :focus-visible { outline: 3px solid var(--rosa); outline-offset: 2px; }
 
-    /* ── Header ─────────────────────────────────────────────────── */
-    header {
-      background: var(--brand);
-      color: #fff;
-      padding: 0 24px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      height: 64px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.18);
+    /* ── Fondo: "Bliss" dithereado + estrellas ──────────────────── */
+    .fondo {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+      background: linear-gradient(var(--c1) 0%, var(--c2) 45%, var(--c3) 72%);
     }
+    .fondo::after {
+      content: ""; position: absolute; inset: 0;
+      background-image: radial-gradient(rgba(0,0,0,.35) 1px, transparent 1.5px);
+      background-size: 5px 5px; mix-blend-mode: multiply; opacity: .35;
+    }
+    .colina { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 46%; }
+    .nube {
+      position: absolute; height: 46px; width: 190px; background: #fff; border-radius: 999px; opacity: var(--nube-op, .92);
+      box-shadow: 54px -20px 0 -6px #fff, -46px -10px 0 -10px #fff;
+    }
+    .nube.a { left: 20%; top: 14%; }
+    .nube.b { right: 14%; top: 30%; transform: scale(.7); }
+    .estrella {
+      position: absolute; width: var(--t); height: var(--t);
+      transform: translate(calc(var(--px, 0) * var(--z) * 1px), calc(var(--py, 0) * var(--z) * 1px)) rotate(var(--r));
+    }
+    .estrella.a { --t: 74px; --z: -30; --r: -12deg; right: 7%; top: 12%; }
+    .estrella.b { --t: 46px; --z: 40;  --r: 14deg;  right: 22%; top: 58%; }
+    .estrella.c { --t: 58px; --z: -22; --r: 8deg;   right: 3%; bottom: 20%; }
+    .estrella.d { --t: 38px; --z: 34;  --r: -20deg; left: 12%; bottom: 14%; }
 
-    .logo-mark {
-      width: 36px; height: 36px;
-      background: var(--brand-light);
-      border-radius: 8px;
+    /* ── Barra lateral amarilla ─────────────────────────────────── */
+    .lateral {
+      position: fixed; z-index: 5; left: 0; top: 0; bottom: var(--barra-h); width: var(--lado-w);
+      background: var(--lateral); border-right: 3px solid var(--negro);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; font-weight: 900; color: #fff;
-      flex-shrink: 0;
     }
+    .marca {
+      font: italic 800 3.1rem/1 var(--f-display);
+      writing-mode: vertical-rl; transform: rotate(180deg);
+      letter-spacing: -1px; white-space: nowrap;
+    }
+    .marca b { color: #FF2E63; font-weight: 800; }
 
-    header h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: .3px;
+    /* ── Íconos del escritorio ──────────────────────────────────── */
+    .iconos {
+      position: fixed; z-index: 1; left: calc(var(--lado-w) + 12px); top: 14px;
+      display: flex; flex-direction: column; gap: 10px; width: 92px;
     }
-    header h1 span {
-      font-weight: 400;
-      opacity: .75;
-      font-size: .9rem;
+    .icono {
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      background: none; border: 1px solid transparent; padding: 6px 4px; cursor: pointer;
+      color: #fff; font: 12.5px/1.2 var(--f-ui); text-align: center;
+      text-shadow: 1px 1px 2px #000, 0 0 3px #000;
     }
+    .icono.sel { background: rgba(49,106,197,.75); border: 1px dotted #fff; }
+    .icono-img {
+      width: 44px; height: 44px; border-radius: 8px; border: 2px solid #000; box-shadow: 3px 3px 0 #000;
+      display: grid; place-items: center; text-shadow: none;
+    }
+    .icono-img.app { background: var(--lateral); color: #000; font: italic 800 20px/1 var(--f-display); }
+    .icono-img.info { background: #2D6CDF; color: #fff; font: 700 26px/1 Georgia, serif; }
 
-    /* ── Layout ─────────────────────────────────────────────────── */
-    main {
-      flex: 1;
-      max-width: 760px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 32px 20px 48px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── Intro ───────────────────────────────────────────────────── */
-    .intro {
-      background: var(--brand-pale);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      font-size: .93rem;
-      color: var(--brand);
-      line-height: 1.55;
-    }
-    .intro strong { font-weight: 700; }
-
-    /* ── Sugerencias ─────────────────────────────────────────────── */
-    .sugerencias-label {
-      font-size: .78rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: .6px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .chip {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 6px 14px;
-      font-size: .82rem;
-      color: var(--brand);
-      cursor: pointer;
-      transition: background .15s, border-color .15s;
-    }
-    .chip:hover {
-      background: var(--brand-pale);
-      border-color: var(--brand-light);
-    }
-
-    /* ── Campo de pregunta ───────────────────────────────────────── */
-    .search-box {
-      background: var(--surface);
-      border: 1.5px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    /* ── Ventanas (reales) ──────────────────────────────────────── */
+    .ventana {
+      position: fixed; left: 0; top: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      background: var(--beige);
+      border: 3px solid var(--azul-osc); border-top: 0;
+      border-radius: 10px 10px 4px 4px;
+      box-shadow: 7px 7px 0 var(--negro);
       overflow: hidden;
-      transition: border-color .2s;
+      transform-origin: 50% 50%;
+      transition: left .2s ease, top .2s ease, width .2s ease, height .2s ease,
+                  transform .22s ease, opacity .22s ease, visibility 0s;
     }
-    .search-box:focus-within {
-      border-color: var(--brand-light);
+    .ventana.arrastrando { transition: none; }
+    .ventana.minimizada {
+      transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(.08);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: left .2s ease, top .2s ease, width .2s ease, height .2s ease,
+                  transform .22s ease, opacity .22s ease, visibility 0s .22s;
     }
+    .ventana.cerrada { display: none; }
+    .ventana.maxi { border-radius: 0; border-width: 0; box-shadow: none; }
+    .ventana.inactiva { border-color: #6582D9; box-shadow: 5px 5px 0 rgba(0,0,0,.55); }
+    .ventana.maxi.inactiva { box-shadow: none; }
+    .ventana.app { container-type: size; container-name: vent; }
 
+    .titulo {
+      flex: none; display: flex; align-items: center; gap: 10px;
+      min-height: 34px; padding: 3px 5px 3px 10px; user-select: none; touch-action: none;
+      background: linear-gradient(var(--lu-top) 0%, var(--lu-mid) 9%, var(--lu-mid2) 42%, var(--lu-mid) 88%, var(--lu-bot) 100%);
+      color: var(--lu-txt); font: 700 14px/1 "Trebuchet MS", var(--f-ui);
+      text-shadow: 1px 1px 0 var(--lu-sombra); cursor: var(--cursor);
+    }
+    .ventana.inactiva .titulo { background: linear-gradient(#7A9BEA 0%, #6F92E6 12%, #6C8EE2 50%, #7C9CEA 90%, #6580DB 100%); color: #E6ECFC; text-shadow: none; }
+    .titulo-icono { width: 18px; height: 18px; border-radius: 3px; background: var(--lateral); color: #000; display: grid; place-items: center; font: 800 13px/1 var(--f-display); text-shadow: none; flex-shrink: 0; border: 0; padding: 0; }
+    .titulo-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rayas { flex: 1; height: 11px; min-width: 20px; background: repeating-linear-gradient(#fff 0 1px, transparent 1px 3px); opacity: .45; }
+    .btn-ventana {
+      width: 24px; height: 24px; border-radius: 4px; border: 1.5px solid #fff; cursor: pointer; flex: none;
+      background: linear-gradient(135deg, #5B94F5, #1D55D9); color: #fff;
+      display: grid; place-items: center; box-shadow: inset 0 0 2px rgba(255,255,255,.6);
+    }
+    .btn-ventana svg { width: 12px; height: 12px; display: block; }
+    .btn-ventana.cerrar { background: linear-gradient(135deg, #F1957A, #C8391B); }
+    .btn-ventana:hover { filter: brightness(1.15); }
+    .i-rest { display: none !important; }
+    .ventana.maxi .i-max { display: none !important; }
+    .ventana.maxi .i-rest { display: block !important; }
+
+    /* manijas para cambiar el tamaño */
+    .rz { position: absolute; z-index: 6; }
+    .rz.n  { top: 0; left: 12px; right: 12px; height: 4px; cursor: ns-resize; }
+    .rz.s  { bottom: 0; left: 12px; right: 12px; height: 6px; cursor: ns-resize; }
+    .rz.e  { right: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+    .rz.w  { left: 0; top: 12px; bottom: 12px; width: 6px; cursor: ew-resize; }
+    .rz.ne { top: 0; right: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+    .rz.nw { top: 0; left: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+    .rz.se { bottom: 0; right: 0; width: 16px; height: 16px; cursor: nwse-resize; }
+    .rz.sw { bottom: 0; left: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+    .ventana.maxi .rz { display: none; }
+
+    /* cuerpo de la ventana principal */
+    .cuerpo { flex: 1; min-height: 0; overflow: auto; display: grid; grid-template-columns: 232px 1fr; grid-auto-rows: minmax(max-content, 1fr); background: #fff; }
+
+    /* panel de tareas (izquierda) */
+    .tareas {
+      background: linear-gradient(#7BA2E7, #6375D6);
+      padding: 14px 12px 18px; display: flex; flex-direction: column; gap: 14px;
+    }
+    .grupo { border-radius: 6px 6px 0 0; overflow: hidden; }
+    .grupo h2 {
+      background: linear-gradient(90deg, #fff 0%, #C6D3F7 100%);
+      color: var(--enlace); font: 700 13px/1.2 var(--f-ui);
+      padding: 7px 10px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .grupo h2::after { content: "⌃"; font-size: 12px; opacity: .7; }
+    .grupo-cuerpo { background: var(--tarea); padding: 8px 10px 10px; }
+
+    .secuencia { list-style: none; position: relative; padding-left: 4px; }
+    .secuencia::before { content: ""; position: absolute; left: 9px; top: 12px; bottom: 12px; border-left: 2px solid #8AA3D6; }
+    .tarea-link {
+      position: relative; display: block; width: 100%; text-align: left;
+      background: none; border: 0; cursor: pointer;
+      padding: 3px 4px 3px 24px; color: var(--enlace); font: 400 13.5px/1.4 var(--f-ui);
+    }
+    .tarea-link::before {
+      content: ""; position: absolute; left: 4px; top: 8px; width: 11px; height: 11px;
+      border-radius: 50%; background: #fff; border: 2px solid var(--enlace);
+    }
+    .mascotas .tarea-link::before { border-radius: 3px; background: var(--verde); border-color: #000; }
+    .tarea-link:hover { text-decoration: underline; }
+    .tarea-link:hover::before { background: var(--lateral); }
+    .detalle { font-size: 12.5px; color: #1b2a55; }
+    .detalle b { display: block; margin-bottom: 2px; }
+
+    /* panel derecho */
+    .contenido { min-width: 0; display: flex; flex-direction: column; }
+
+    .hero {
+      position: relative; background: var(--acido); border-bottom: 2px solid var(--negro);
+      padding: 22px; overflow: hidden;
+    }
+    .hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(0,0,0,.18) 1px, transparent 1.4px); background-size: 5px 5px; pointer-events: none; }
+    .hero > * { position: relative; }
+    .hero h1 {
+      font: italic 800 clamp(2rem, 7.5cqw, 4.6rem)/.95 var(--f-display);
+      text-transform: uppercase; letter-spacing: -1px; max-width: 12ch;
+    }
+    .hero p { margin-top: 12px; max-width: 42ch; font-size: .95rem; }
+    .sticker {
+      position: absolute; right: 22px; top: 18px;
+      background: #000; color: var(--acido);
+      font: italic 800 .85rem/1.15 var(--f-display); text-align: center;
+      padding: 14px 20px; border-radius: 50%; transform: rotate(-9deg);
+    }
+    .carita { position: absolute; right: 26px; bottom: 14px; width: 78px; height: 78px; }
+
+    .consulta { padding: 18px 22px 8px; }
+    .consulta label { display: block; font-weight: 700; margin-bottom: 6px; }
+    .campo { border: 2px solid var(--negro); background: #fff; }
+    .campo:focus-within { box-shadow: 0 0 0 3px var(--cian); }
     textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      resize: none;
-      padding: 16px;
-      font-size: 1rem;
-      font-family: inherit;
-      color: var(--text);
-      background: transparent;
-      min-height: 90px;
+      display: block; width: 100%; min-height: 84px; resize: none;
+      border: 0; outline: 0; padding: 12px 14px; background: transparent;
+      font: 400 1.05rem/1.5 var(--f-ui); color: #000;
+    }
+    textarea::placeholder { color: #55607a; }
+    .campo-pie { display: flex; flex-direction: row-reverse; align-items: center; justify-content: flex-end; gap: 16px; padding: 8px 14px 8px 8px; border-top: 1px solid #C9CFDD; background: #F6F6F2; }
+    .ayuda { font-size: .8rem; color: #4a5470; }
+    .aviso { margin-top: 8px; font-size: .82rem; color: #3a4460; }
+
+
+    /* fuentes: vista de detalles del Explorador */
+    #fuentes-card { display: none; padding: 14px 22px 22px; }
+    #fuentes-card.visible { display: block; }
+    #fuentes-card h2 { font: 700 .95rem var(--f-ui); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    #fuentes-card h2 i { width: 12px; height: 12px; background: var(--verde); border: 2px solid #000; display: inline-block; }
+    .lista { border: 1px solid #7F9DB9; background: #fff; }
+    .lista-cab, .fila { display: grid; grid-template-columns: 1.15fr 1.35fr 150px; gap: 10px; align-items: center; padding: 5px 10px; }
+    .lista-cab { background: linear-gradient(#fff, #ECEBE5); border-bottom: 1px solid #C9CFDD; font-size: .8rem; color: #333; }
+    .lista ol { list-style: none; }
+    .fila { font-size: .9rem; animation: fila .22s ease-out backwards; animation-delay: var(--demora); }
+    @keyframes fila { from { opacity: 0; transform: translateX(-10px); } }
+    .fila:hover { background: #316AC5; color: #fff; }
+    .fila-nombre { font-weight: 700; overflow-wrap: anywhere; }
+    .fila-sec { overflow-wrap: anywhere; }
+    .pb { display: flex; align-items: center; gap: 8px; }
+    .pb-barra { flex: 1; height: 14px; border: 1px solid #686868; border-radius: 3px; background: #fff; padding: 1px; }
+    .pb-barra i { display: block; height: 100%; border-radius: 2px; background: repeating-linear-gradient(90deg, #2FC52F 0 6px, transparent 6px 8px); }
+    .pb-pct { font: .78rem var(--f-mono); min-width: 3ch; text-align: right; }
+
+    .estado { flex: none; display: flex; gap: 2px; background: var(--beige); border-top: 1px solid #fff; font-size: .78rem; color: #222; }
+    .estado span { padding: 4px 10px; border-right: 1px solid #A5A28E; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .estado span:last-child { flex: 1; border-right: 0; }
+
+    /* la ventana reacciona a su tamaño (container queries) */
+    @container vent (max-width: 660px) {
+      .cuerpo { grid-template-columns: 1fr; grid-auto-rows: max-content; }
+      .tareas { padding: 10px; gap: 8px; }
+      .secuencia { display: flex; flex-wrap: wrap; gap: 0 6px; }
+      .secuencia::before { display: none; }
+      .tarea-link { width: auto; padding-right: 8px; }
+      .detalle-grupo, .sticker { display: none; }
+      .carita { width: 56px; height: 56px; }
+      .lista-cab { display: none; }
+      .fila { grid-template-columns: 1fr 96px; }
+      .fila-sec { grid-column: 1; grid-row: 2; font-size: .8rem; }
+      .fila .pb { grid-column: 2; grid-row: 1 / span 2; }
+      .ayuda { display: none; }
+      .consulta, #fuentes-card { padding-left: 14px; padding-right: 14px; }
+      .hero { padding: 16px 14px; }
+    }
+    @container vent (max-width: 520px) {
+      .estado span:nth-child(2) { display: none; }
+      .titulo-txt { max-width: 38cqw; }
+    }
+    @container vent (max-height: 470px) {
+      .hero p, .sticker, .carita { display: none; }
+      .hero { padding: 10px 22px; }
+      .hero h1 { font-size: 1.8rem; }
+    }
+    @container vent (min-width: 1000px) {
+      .cuerpo { grid-template-columns: 280px 1fr; }
+      .hero { padding: 34px; }
+      .hero h1 { max-width: 14ch; }
+      .hero p { font-size: 1.1rem; }
+      .consulta, #fuentes-card { padding-left: 34px; padding-right: 34px; }
+      textarea { min-height: 120px; font-size: 1.15rem; }
+      .tarea-link { font-size: 15px; }
+      .fila { font-size: 1rem; }
     }
 
-    .search-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      background: #FAFCFB;
+    /* ── Cuadros de diálogo ─────────────────────────────────────── */
+    .dialogo { width: min(400px, calc(100vw - 24px)); }
+    .dialogo-cuerpo { display: flex; gap: 14px; align-items: flex-start; padding: 20px 20px 12px; background: var(--beige); }
+    .dialogo-cuerpo p { white-space: pre-wrap; font-size: .93rem; overflow-wrap: anywhere; }
+    .dlg-ico { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #fff; border: 2px solid #fff; box-shadow: 0 0 0 2px #000; font: 800 24px/1 Georgia, serif; }
+    .dlg-ico.info { background: #2D6CDF; }
+    .dlg-ico.error { background: #D9361B; font-family: var(--f-ui); }
+    .dlg-ico.alerta { background: #F0B400; color: #000; font-family: var(--f-ui); }
+    .dialogo-pie { display: flex; justify-content: center; padding: 8px 20px 18px; background: var(--beige); }
+    .btn-xp {
+      min-width: 92px; padding: 5px 16px; cursor: pointer; font: .9rem var(--f-ui); color: #000;
+      border: 1px solid #003C74; border-radius: 3px;
+      background: linear-gradient(#fff, #ECEBE5 85%, #D6D0C5);
+    }
+    .btn-xp:hover { box-shadow: inset 0 0 0 2px #FFC83C; }
+    .btn-xp:focus-visible { outline: 2px dotted #000; outline-offset: -4px; }
+    .btn-xp:active:not(:disabled) { background: linear-gradient(#CECABB, #E3E1D6); box-shadow: inset 1px 1px 3px rgba(0,0,0,.3); }
+    .btn-xp:disabled { color: #ACA899; border-color: #C9C7BA; background: #F4F3EE; box-shadow: none; }
+    /* botón predeterminado: resplandor azul; el de Preguntar lleva el cuadrito verde "Ir" de XP */
+    .btn-xp.principal {
+      display: inline-flex; align-items: center; gap: 9px; padding: 5px 20px 5px 8px;
+      font: 700 .98rem var(--f-ui); box-shadow: inset 0 0 0 2px #98B8F8;
+    }
+    .btn-xp.principal:hover:not(:disabled) { box-shadow: inset 0 0 0 2px #FFC83C; }
+    .btn-xp.principal:active:not(:disabled) { box-shadow: inset 1px 1px 3px rgba(0,0,0,.3), inset 0 0 0 2px #98B8F8; }
+    .btn-xp .ir {
+      width: 22px; height: 22px; flex: none; display: grid; place-items: center; color: #fff;
+      border: 1px solid #1F6F1F; border-radius: 4px;
+      background: linear-gradient(#7BE07B, #34A334 55%, #2A8A2A);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.55);
+    }
+    .btn-xp .ir svg { width: 14px; height: 14px; }
+    .btn-xp:disabled .ir { filter: grayscale(1) opacity(.6); }
+
+    /* ── Dosi (asistente) ───────────────────────────────────────── */
+    .asistente {
+      position: fixed; z-index: 20; right: 16px; bottom: calc(var(--barra-h) + 12px);
+      width: min(430px, calc(100vw - 24px));
+      display: flex; flex-direction: column; align-items: flex-end; gap: 16px;
+      pointer-events: none; perspective: 800px; --cola: 56px;
+    }
+    .asistente > * { pointer-events: auto; }
+
+    .globo {
+      position: relative; width: 100%;
+      background: var(--globo); border: 2px solid #000; border-radius: 10px;
+      box-shadow: 4px 4px 0 #000;
+      padding: 12px 14px 16px; font-size: .98rem; line-height: 1.55; cursor: pointer;
+    }
+    .globo[hidden] { display: none; }
+    .globo::before { content: ""; position: absolute; right: var(--cola); bottom: -17px; border: 9px solid transparent; border-top: 15px solid #000; border-bottom: 0; }
+    .globo::after { content: ""; position: absolute; right: calc(var(--cola) + 3px); bottom: -11px; border: 6px solid transparent; border-top: 11px solid var(--globo); border-bottom: 0; }
+    .globo-x {
+      position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; cursor: pointer;
+      background: #fff; border: 1.5px solid #000; border-radius: 3px; font: 700 14px/1 var(--f-ui);
+      display: grid; place-items: center;
+    }
+    .globo-x:hover { background: var(--rosa); }
+    .globo-cuerpo { max-height: min(46vh, 360px); overflow-y: auto; padding-right: 26px; }
+    .globo-texto { white-space: pre-wrap; overflow-wrap: anywhere; }
+    .globo-fin { display: none; position: absolute; right: 12px; bottom: 3px; font-size: .75rem; color: #C2183C; animation: titilar 1s steps(2) infinite; }
+    .globo.listo .globo-fin { display: block; }
+    @keyframes titilar { 50% { opacity: 0; } }
+
+    .carga { display: none; position: relative; overflow: hidden; height: 17px; width: 100%; max-width: 250px; margin-top: 10px; padding: 2px; border: 1px solid #686868; border-radius: 3px; background: #fff; }
+    .globo.pensando .carga { display: block; }
+    .carga i {
+      display: block; width: 46px; height: 100%; border-radius: 2px;
+      background: repeating-linear-gradient(90deg, #2FC52F 0 10px, transparent 10px 13px);
+      box-shadow: inset 0 3px 0 rgba(255,255,255,.35);
+      animation: marquesina 1.5s linear infinite;
+    }
+    @keyframes marquesina { from { transform: translateX(-50px); } to { transform: translateX(260px); } }
+
+    .dosi {
+      display: block; width: 128px; margin-right: 4px; background: none; border: 0; cursor: pointer; padding: 0; position: relative;
+      transform-style: preserve-3d;
+      transform: rotateY(calc(var(--tx, 0) * 14deg)) rotateX(calc(var(--ty, 0) * -8deg));
+      will-change: transform;
+    }
+    .dosi::after {
+      content: ""; position: absolute; z-index: -1; left: 14%; right: 14%; bottom: -8px; height: 12px;
+      border-radius: 50%; background: rgba(0,0,0,.3); filter: blur(2px);
+      transform: translateX(calc(var(--tx, 0) * -10px));
+      animation: sombra 2.6s ease-in-out infinite;
+    }
+    @keyframes sombra { 0%, 100% { scale: 1; opacity: 1; } 50% { scale: .8; opacity: .6; } }
+    .dosi svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(3px 4px 0 rgba(0,0,0,.35)); animation: flotar 2.6s ease-in-out infinite; transform-origin: 50% 100%; }
+    @keyframes flotar { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+    .dosi svg[data-estado="hablando"] { animation-duration: 1.2s; }
+
+    .dosi .ojos { transform-box: fill-box; transform-origin: center; animation: parpadeo 4.5s infinite; }
+    @keyframes parpadeo { 0%,94%,100% { transform: scaleY(1); } 96.5% { transform: scaleY(.1); } }
+    .dosi .pupilas { transition: transform .2s; transform: translate(calc(var(--tx, 0) * 3.5px), calc(var(--ty, 0) * 2.5px)); }
+    .dosi svg[data-estado="pensando"] .pupilas { transform: translate(calc(var(--tx, 0) * 3.5px), calc(var(--ty, 0) * 2.5px - 5px)); }
+    .dosi .cara { transform: translate(calc(var(--tx, 0) * 5px), calc(var(--ty, 0) * 3px)); }
+    .dosi .brillo { transform: translateX(calc(var(--tx, 0) * 12px)); }
+    .dosi .cejas { transition: transform .15s; }
+    .dosi svg[data-boca="abierta"] .cejas { transform: translateY(-3px); }
+    .dosi svg[data-estado="pensando"] .cejas { transform: translateY(-4px); }
+    .dosi .embolo { transition: transform .2s; }
+    .dosi svg[data-estado="pensando"] .embolo { animation: bombear .9s ease-in-out infinite; }
+    @keyframes bombear { 0%,100% { transform: translateY(0); } 50% { transform: translateY(14px); } }
+    .dosi .boca-abierta { opacity: 0; }
+    .dosi svg[data-boca="abierta"] .boca-abierta { opacity: 1; }
+    .dosi svg[data-boca="abierta"] .boca-sonrisa { opacity: 0; }
+    .dosi .brazo-izq { transform-box: view-box; transform-origin: 62px 140px; }
+    .dosi svg[data-estado="hablando"] .brazo-izq { animation: saludar .5s ease-in-out infinite alternate; }
+    @keyframes saludar { from { transform: rotate(0); } to { transform: rotate(-22deg); } }
+    .dosi .oreja-perro, .dosi .oreja-gato { display: none; }
+    .dosi svg[data-mascota="perro"] .oreja-perro, .dosi svg[data-mascota="gato"] .oreja-gato { display: inline; }
+    .dosi .cejas-error, .dosi .sudor { opacity: 0; }
+    .dosi svg[data-estado="error"] .cejas-error, .dosi svg[data-estado="error"] .sudor { opacity: 1; }
+    .dosi svg[data-estado="error"] .cejas { opacity: 0; }
+
+    /* ── Barra de tareas ────────────────────────────────────────── */
+    .barra-tareas {
+      position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; height: var(--barra-h);
+      display: flex; align-items: stretch; gap: 8px;
+      background: linear-gradient(var(--barra-a) 0%, var(--barra-b) 8%, var(--barra-c) 18%, var(--barra-c) 70%, var(--barra-d) 100%);
+      border-top: 2px solid var(--barra-borde);
+    }
+    .inicio {
+      display: flex; align-items: center; gap: 8px; padding: 0 22px 0 12px; cursor: pointer; flex: none;
+      background: linear-gradient(#5AC85A 0%, #3C9F3C 14%, #38963A 80%, #2D7C2F 100%);
+      border: 0; border-radius: 0 14px 14px 0; box-shadow: inset -2px 0 3px rgba(0,0,0,.3), 2px 0 0 rgba(0,0,0,.3);
+      color: #fff; font: italic 800 1.15rem/1 var(--f-display); text-shadow: 1px 2px 2px rgba(0,0,0,.5);
+    }
+    .inicio:hover { filter: brightness(1.1); }
+    .inicio-ico { width: 22px; height: 22px; border-radius: 50%; background: #fff; color: #2D7C2F; display: grid; place-items: center; font: 800 15px/1 var(--f-display); text-shadow: none; }
+    .tareas-abiertas { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; padding-left: 6px; }
+    .tarea-btn {
+      display: flex; align-items: center; gap: 8px; width: 100%; max-width: 220px; min-width: 0; height: 30px; padding: 0 10px;
+      border-radius: 4px; border: 1px solid #1A3E8C; cursor: pointer;
+      background: linear-gradient(#4F8EF0, #3A78E2); color: #fff; font-size: .85rem;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+    }
+    .tarea-btn:hover { filter: brightness(1.1); }
+    .tarea-btn.activa { background: #1E52B7; box-shadow: inset 1px 1px 3px rgba(0,0,0,.55); }
+    .tarea-btn.aviso { animation: avisar 1s steps(2) infinite; }
+    @keyframes avisar { 50% { background: #F7A21B; color: #000; } }
+    .tarea-btn[hidden] { display: none; }
+    .tarea-btn .tarea-ico { width: 16px; height: 16px; border-radius: 3px; background: var(--lateral); color: #000; display: grid; place-items: center; font: 800 11px/1 var(--f-display); flex: none; }
+    .tarea-btn .tarea-txt { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bandeja {
+      margin-left: auto; display: flex; align-items: center; gap: 12px; padding: 0 14px; flex: none;
+      background: linear-gradient(var(--bandeja-a), var(--bandeja-b)); border-left: 2px solid rgba(0,0,0,.35);
+      box-shadow: inset 2px 0 3px rgba(255,255,255,.25); color: var(--bandeja-txt);
+    }
+    .btn-sonido { background: none; border: 0; color: var(--bandeja-txt); cursor: pointer; display: grid; place-items: center; padding: 4px; border-radius: 4px; }
+    .btn-sonido:hover { background: rgba(255,255,255,.2); }
+    .btn-sonido svg { width: 20px; height: 20px; }
+    .btn-sonido .x { display: none; }
+    .btn-sonido[aria-pressed="false"] .x { display: block; }
+    .btn-sonido[aria-pressed="false"] .ondas { display: none; }
+    .reloj { font: .78rem var(--f-mono); letter-spacing: .3px; display: flex; align-items: center; gap: 7px; }
+    .reloj::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #FF4B4B; animation: titilar 1.2s steps(2) infinite; }
+
+    /* menú Inicio */
+    .menu-inicio {
+      position: fixed; z-index: 40; left: 0; bottom: var(--barra-h);
+      width: min(380px, 100vw); border: 2px solid #0831D9; border-bottom: 0; border-radius: 8px 8px 0 0;
+      overflow: hidden; box-shadow: 6px 0 0 #000;
+    }
+    .menu-inicio[hidden] { display: none; }
+    .menu-cab { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: linear-gradient(var(--lu-top), var(--lu-bot)); color: var(--lu-txt); font: 700 1rem "Trebuchet MS", var(--f-ui); text-shadow: 1px 1px 0 var(--lu-sombra); }
+    .menu-cab i { width: 34px; height: 34px; border-radius: 4px; background: var(--lateral); border: 2px solid #fff; overflow: hidden; display: grid; place-items: center; font: italic 800 15px/1 var(--f-display); color: #000; text-shadow: none; }
+    .menu-cols { display: grid; grid-template-columns: 1.4fr 1fr; background: #fff; }
+    .menu-cols > div { padding: 8px 0; }
+    .menu-cols > div:last-child { background: #D3E5FA; border-left: 1px solid #95BDEE; }
+    .menu-cols h3 { font: 700 .72rem var(--f-ui); color: #4a5a85; padding: 2px 14px 6px; }
+    .menu-item { display: block; width: 100%; text-align: left; background: none; border: 0; cursor: pointer; padding: 7px 14px; font-size: .86rem; color: #000; line-height: 1.3; }
+    .menu-item:hover { background: #316AC5; color: #fff; }
+    .menu-item.fuerte { font-weight: 700; }
+    .menu-pie { background: linear-gradient(#4282D6, #3168D5); color: #fff; font-size: .75rem; padding: 6px 12px; text-align: right; }
+
+    /* ── Pantalla de bienvenida ─────────────────────────────────── */
+    .bienvenida {
+      position: fixed; inset: 0; z-index: 100; background: #5A7EDC;
+      display: grid; grid-template-rows: 14vh 1fr 14vh; transition: opacity .7s ease;
+    }
+    .bienvenida.saliendo { opacity: 0; pointer-events: none; }
+    .bv-top { background: #00309C; box-shadow: 0 2px 0 #6D8CE6; }
+    .bv-bajo { background: #00309C; box-shadow: 0 -3px 0 #E48C16; display: flex; align-items: center; padding: 0 5vw; color: #fff; font-size: .9rem; }
+    .bv-centro {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 25% 30%, #7F9CEA, #5A7EDC 60%);
+    }
+    .bv-centro::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(0,0,0,.25) 1px, transparent 1.5px); background-size: 5px 5px; opacity: .25; pointer-events: none; }
+    .bv-izq { position: relative; flex: 0 1 460px; text-align: right; padding: 0 36px; color: #fff; }
+    .bv-izq h1 { font: italic 800 clamp(3rem, 8vw, 5rem)/.95 var(--f-display); letter-spacing: -2px; text-shadow: 4px 4px 0 #000; }
+    .bv-izq h1 b { color: #FF2E63; }
+    .bv-izq p { margin-top: 14px; font-size: 1.1rem; text-shadow: 1px 1px 0 #00309C; }
+    .bv-linea { position: relative; width: 2px; height: 55%; background: linear-gradient(transparent, #B3C6F6, transparent); }
+    .bv-usuario {
+      position: relative; flex: 0 1 360px; display: flex; align-items: center; gap: 16px; padding: 14px 20px; margin-left: 24px;
+      background: none; border: 0; border-radius: 8px; color: #fff; cursor: pointer; text-align: left;
+    }
+    .bv-usuario:hover, .bv-usuario:focus-visible { background: rgba(255,255,255,.18); }
+    .bv-avatar { width: 68px; height: 68px; border-radius: 8px; background: var(--lateral); border: 3px solid #fff; box-shadow: 4px 4px 0 #000; display: grid; place-items: center; color: #000; font: italic 800 28px/1 var(--f-display); flex: none; }
+    .bv-nombre { font: 700 1.5rem/1.1 var(--f-ui); }
+    .bv-nombre small { display: block; margin-top: 4px; font: 400 .85rem var(--f-ui); opacity: .9; }
+
+
+    /* ── Fondos de escritorio (Propiedades de pantalla) ─────────── */
+    [data-fondo="bliss"]     { --c1: #2F6FD6; --c2: #6DAEF5; --c3: #CFE8FF; --col-1: #7BE03F; --col-2: #2E8B18; --nube-op: .92; }
+    [data-fondo="atardecer"] { --c1: #3B2A6B; --c2: #E85D75; --c3: #FFC857; --col-1: #6B3F86; --col-2: #2B1B4A; --nube-op: .35; }
+    [data-fondo="noche"]     { --c1: #050B26; --c2: #0B1D5C; --c3: #1B3A8C; --col-1: #12344F; --col-2: #06141F; --nube-op: 0; }
+    [data-fondo="rombos"]    { --col-1: #22B722; --col-2: #22B722; --nube-op: 0; }
+    .sc1 { stop-color: var(--col-1); } .sc2 { stop-color: var(--col-2); }
+    .fondo[data-fondo="rombos"], .vista[data-fondo="rombos"] {
+      background-color: #FF2FC0;
+      background-image: linear-gradient(45deg, #22B722 25%, transparent 25%, transparent 75%, #22B722 75%),
+                        linear-gradient(45deg, #22B722 25%, transparent 25%, transparent 75%, #22B722 75%);
+      background-size: 90px 90px; background-position: 0 0, 45px 45px;
+    }
+    .fondo[data-fondo="rombos"] .colina, .fondo[data-fondo="rombos"] .nube { display: none; }
+    .fondo[data-fondo="noche"]::before {
+      content: ""; position: absolute; inset: 0;
+      background-image:
+        radial-gradient(1.6px 1.6px at 12% 18%, #fff, transparent), radial-gradient(1.2px 1.2px at 28% 8%, #fff, transparent),
+        radial-gradient(1.8px 1.8px at 44% 22%, #FFF200, transparent), radial-gradient(1.2px 1.2px at 63% 12%, #fff, transparent),
+        radial-gradient(1.6px 1.6px at 77% 28%, #fff, transparent), radial-gradient(1.2px 1.2px at 90% 9%, #fff, transparent),
+        radial-gradient(1.4px 1.4px at 8% 42%, #fff, transparent), radial-gradient(1.2px 1.2px at 55% 38%, #fff, transparent),
+        radial-gradient(1.6px 1.6px at 36% 46%, #fff, transparent), radial-gradient(1.2px 1.2px at 84% 48%, #fff, transparent);
+    }
+    .fondo.refrescando { animation: refrescar .25s steps(2) 2; }
+    @keyframes refrescar { 50% { opacity: .25; } }
+
+    /* ── Combinaciones de color ─────────────────────────────────── */
+    html[data-tema="oliva"] {
+      --lu-top: #C3D49A; --lu-mid: #8FA862; --lu-mid2: #7F9954; --lu-bot: #64803B; --azul-osc: #64803B; --lu-txt: #fff; --lu-sombra: #3B4D1E;
+      --barra-a: #A6BA74; --barra-b: #B9CC8B; --barra-c: #8CA45B; --barra-d: #5F7A36; --barra-borde: #CFE0A6;
+      --bandeja-a: #7F9954; --bandeja-b: #64803B;
+    }
+    html[data-tema="oliva"] .ventana.inactiva .titulo { background: linear-gradient(#C9D3B2, #B4C093); color: #3D4A25; text-shadow: none; }
+    html[data-tema="oliva"] .ventana.inactiva { border-color: #94A66E; }
+    html[data-tema="y2k"] {
+      --lu-top: #FFF9A8; --lu-mid: #FFF200; --lu-mid2: #FFF200; --lu-bot: #E8CF00; --azul-osc: #000; --lu-txt: #000; --lu-sombra: transparent;
+      --barra-a: #FF9FB3; --barra-b: #FF7D98; --barra-c: #FF5C7C; --barra-d: #E0305A; --barra-borde: #000;
+      --bandeja-a: #000; --bandeja-b: #000; --bandeja-txt: #FFF200;
+    }
+    html[data-tema="y2k"] .ventana.inactiva .titulo { background: #E9E5A8; color: #55524A; text-shadow: none; }
+    html[data-tema="y2k"] .ventana.inactiva { border-color: #555; }
+    html[data-tema="y2k"] .btn-ventana { background: #fff; border-color: #000; }
+    html[data-tema="y2k"] .btn-ventana.cerrar { background: var(--rosa); }
+    html[data-tema="y2k"] .btn-ventana svg * { stroke: #000; }
+    html[data-tema="y2k"] .btn-ventana rect[fill] { fill: #000; }
+    html[data-tema="y2k"] .rayas { background: repeating-linear-gradient(#000 0 1px, transparent 1px 3px); }
+
+    /* ── Cursor, mano y tipografía de "chrome" ──────────────────── */
+    html, body { cursor: var(--cursor); }
+    button:not(:disabled), .icono, .menu-item, [role="menuitem"], [role="radio"], .bv-usuario { cursor: var(--mano); }
+    .dosi:not(:disabled) { cursor: grab; }
+    .dosi.arrastrando { cursor: grabbing !important; }
+    .estado, .menu-item, .tarea-btn, .icono, .lista-cab, .ctx, .reloj {
+      font-family: Tahoma, "Segoe UI", Verdana, sans-serif; -webkit-font-smoothing: none; text-rendering: optimizeSpeed;
     }
 
-    .hint { font-size: .78rem; color: var(--text-muted); }
-
-    button#btn-enviar {
-      background: var(--brand);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 9px 22px;
-      font-size: .9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s;
-      display: flex; align-items: center; gap: 8px;
-    }
-    button#btn-enviar:hover  { background: var(--accent); }
-    button#btn-enviar:disabled { opacity: .55; cursor: not-allowed; }
-
-    /* ── Spinner ─────────────────────────────────────────────────── */
-    .spinner {
-      display: none;
-      align-items: center;
-      gap: 10px;
-      color: var(--brand);
-      font-size: .9rem;
-    }
-    .spinner.visible { display: flex; }
-
-    .spin-ring {
-      width: 20px; height: 20px;
-      border: 2.5px solid var(--border);
-      border-top-color: var(--brand);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Resultado ───────────────────────────────────────────────── */
-    #resultado { display: none; flex-direction: column; gap: 12px; }
-    #resultado.visible { display: flex; }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    /* ── Login con varios usuarios ──────────────────────────────── */
+    .bv-usuarios { position: relative; flex: 0 1 380px; margin-left: 24px; display: flex; flex-direction: column; gap: 6px; max-height: 100%; overflow-y: auto; padding: 4px; }
+    .bv-usuario { flex: none; width: 100%; margin-left: 0; border: 2px solid transparent; }
+    .bv-usuario:hover, .bv-usuario:focus-visible { border-color: #F6A53C; outline: none; }
+    .bv-avatar { overflow: hidden; background: #fff; }
+    .bv-avatar.dosi { background: var(--lateral); }
+    .bv-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bv-avatar img.pixel, .menu-cab img.pixel { image-rendering: pixelated; }
+    .menu-cab img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    @media (max-height: 720px) {
+      .bv-avatar { width: 52px; height: 52px; }
+      .bv-usuario { padding: 8px 14px; }
+      .bv-nombre { font-size: 1.2rem; }
     }
 
-    .card-header {
-      background: var(--brand);
-      color: #fff;
-      padding: 11px 18px;
-      font-size: .82rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      display: flex; align-items: center; gap: 8px;
-    }
+    /* ── Dosi arrastrable: el globo cambia de lado ──────────────── */
+    .asistente[data-lado="izq"] { align-items: flex-start; }
+    .asistente[data-lado="izq"] .globo::before { right: auto; left: var(--cola); }
+    .asistente[data-lado="izq"] .globo::after  { right: auto; left: calc(var(--cola) + 3px); }
+    .asistente[data-vert="abajo"] { flex-direction: column-reverse; }
+    .asistente[data-vert="abajo"] .globo::before { bottom: auto; top: -17px; border-top: 0; border-bottom: 15px solid #000; }
+    .asistente[data-vert="abajo"] .globo::after  { bottom: auto; top: -11px; border-top: 0; border-bottom: 11px solid var(--globo); }
+    .dosi { margin: 0 4px; touch-action: none; }
 
-    .card-body {
-      padding: 18px 20px;
-      line-height: 1.65;
-      font-size: .97rem;
-    }
-    .card-body p { margin-bottom: 10px; }
-    .card-body ul, .card-body ol { padding-left: 20px; margin-bottom: 10px; }
-    .card-body li { margin-bottom: 4px; }
-    .card-body strong { color: var(--brand); }
+    /* ── Travesuras de Dosi cuando estás inactivo ───────────────── */
+    .dosi .brazo-der { transform-box: view-box; transform-origin: 138px 140px; }
+    .dosi svg[data-travesura="rascar"] .brazo-der { animation: rascar 2.4s ease-in-out; }
+    @keyframes rascar { 0%, 100% { transform: rotate(0); } 18% { transform: rotate(-125deg); } 28% { transform: rotate(-112deg); } 38% { transform: rotate(-126deg); } 48% { transform: rotate(-112deg); } 58% { transform: rotate(-126deg); } 74% { transform: rotate(-120deg); } }
+    .dosi svg[data-travesura="mirar"] .pupilas { animation: mirar 2.6s ease-in-out; }
+    .dosi svg[data-travesura="mirar"] .cara { animation: girar 2.6s ease-in-out; }
+    @keyframes mirar { 0%, 100% { transform: translate(0, 0); } 12%, 38% { transform: translate(-5px, -1px); } 52%, 82% { transform: translate(5px, -1px); } }
+    @keyframes girar { 0%, 100% { transform: translateX(0); } 12%, 38% { transform: translateX(-4px); } 52%, 82% { transform: translateX(4px); } }
+    .dosi svg[data-travesura="dormir"] { animation-duration: 4.5s; }
+    .dosi svg[data-travesura="dormir"] .ojos { animation: none; transform: scaleY(.08); }
+    .dosi svg[data-travesura="dormir"] .cejas { transform: translateY(6px); }
+    .dosi svg[data-travesura="dormir"] .cara { transform: translateY(4px); }
+    .dosi .zzz { opacity: 0; }
+    .dosi svg[data-travesura="dormir"] .zzz { opacity: 1; }
+    .zzz text { font: italic 800 18px "Poppins", sans-serif; fill: #000; stroke: #fff; stroke-width: 1px; paint-order: stroke; animation: zzz 2.4s ease-in infinite; }
+    .zzz text:nth-child(2) { animation-delay: .8s; font-size: 24px; }
+    .zzz text:nth-child(3) { animation-delay: 1.6s; font-size: 30px; }
+    @keyframes zzz { 0% { opacity: 0; transform: translate(0, 10px); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(10px, -26px); } }
+    .dosi svg[data-travesura="despierta"] { animation: salto .55s ease-out; }
+    .dosi svg[data-travesura="despierta"] .ojos { animation: ojosgrandes .55s ease-out; }
+    @keyframes salto { 0% { transform: translateY(0); } 35% { transform: translateY(-16px); } 100% { transform: translateY(0); } }
+    @keyframes ojosgrandes { 0% { transform: scale(1.35); } 100% { transform: scale(1); } }
 
-    /* ── Fuentes ─────────────────────────────────────────────────── */
-    .fuentes-lista { display: flex; flex-direction: column; gap: 6px; }
-
-    .fuente-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 10px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: .85rem;
+    /* ── Globo de la bandeja ────────────────────────────────────── */
+    .aviso-bandeja {
+      position: fixed; z-index: 35; right: 10px; bottom: calc(var(--barra-h) + 14px);
+      width: min(300px, calc(100vw - 20px));
+      background: var(--globo); border: 2px solid #000; border-radius: 8px; box-shadow: 4px 4px 0 #000;
+      padding: 10px 12px 12px; cursor: var(--mano);
     }
+    .aviso-bandeja[hidden] { display: none; }
+    .aviso-bandeja::before { content: ""; position: absolute; right: 26px; bottom: -17px; border: 9px solid transparent; border-top: 15px solid #000; border-bottom: 0; }
+    .aviso-bandeja::after { content: ""; position: absolute; right: 29px; bottom: -11px; border: 6px solid transparent; border-top: 11px solid var(--globo); border-bottom: 0; }
+    .av-cab { display: flex; align-items: center; gap: 8px; font: 700 .88rem var(--f-ui); padding-right: 22px; }
+    .av-ico { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: #fff; font: 700 12px/1 Georgia, serif; flex: none; }
+    .av-ico.info { background: #2D6CDF; }
+    .av-ico.error { background: #D9361B; font-family: var(--f-ui); }
+    .av-txt { margin-top: 4px; font-size: .85rem; line-height: 1.4; }
+    .av-x { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: #fff; border: 1.5px solid #000; border-radius: 3px; font: 700 13px/1 var(--f-ui); display: grid; place-items: center; }
+    .av-x:hover { background: var(--rosa); }
+    .red { display: grid; place-items: center; color: var(--bandeja-txt); }
+    .red svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+    .red.ok { color: #7DFF9A; }
+    .red.err { color: #FF8F8F; }
 
-    .fuente-num {
-      background: var(--brand-light);
-      color: #fff;
-      border-radius: 50%;
-      width: 20px; height: 20px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: .72rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
+    /* ── Menús contextuales y menú de ventana ───────────────────── */
+    .ctx { position: fixed; z-index: 60; min-width: 210px; padding: 3px; background: #fff; border: 1px solid #ACA899; box-shadow: 3px 3px 0 #000; font-size: 12.5px; }
+    .ctx[hidden] { display: none; }
+    .ctx button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 5px 28px 5px 26px; font: inherit; color: #000; }
+    .ctx button:hover:not(:disabled), .ctx button:focus-visible { background: #316AC5; color: #fff; outline: none; }
+    .ctx button:disabled { color: #9A9A9A; }
+    .ctx button.fuerte { font-weight: 700; }
+    .ctx hr { border: 0; border-top: 1px solid #ACA899; margin: 3px 2px; }
 
-    .fuente-txt { color: var(--text); line-height: 1.4; }
-    .fuente-origen { font-weight: 600; color: var(--brand); }
-    .fuente-seccion { color: var(--text-muted); }
-    .fuente-dist {
-      margin-left: auto;
-      font-size: .75rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      padding-left: 8px;
-    }
+    /* ── Propiedades de pantalla ────────────────────────────────── */
+    .propiedades { width: min(430px, calc(100vw - 24px)); }
+    .prop-cuerpo { padding: 14px 16px 6px; background: var(--beige); display: grid; gap: 12px; }
+    .vista { position: relative; width: 190px; height: 136px; margin: 0 auto; border: 4px solid #000; border-radius: 8px; overflow: hidden; box-shadow: 3px 3px 0 #000; }
+    .vista:not([data-fondo="rombos"]) { background: linear-gradient(var(--c1) 0%, var(--c2) 45%, var(--c3) 72%); }
+    .vista-colina { position: absolute; left: -10%; right: -10%; bottom: -34%; height: 62%; border-radius: 50%; background: linear-gradient(var(--col-1), var(--col-2)); }
+    .vista[data-fondo="rombos"] .vista-colina { display: none; }
+    .prop-cuerpo fieldset { border: 1px solid #ACA899; border-radius: 3px; padding: 4px 8px 8px; }
+    .prop-cuerpo legend { padding: 0 4px; font-size: .82rem; color: #0A246A; }
+    .opciones { display: grid; gap: 2px; }
+    .opcion { display: flex; align-items: center; gap: 8px; text-align: left; background: #fff; border: 1px solid transparent; padding: 4px 8px; font: .88rem var(--f-ui); color: #000; }
+    .opcion::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #1C5180; background: #fff; }
+    .opcion[aria-checked="true"] { background: #316AC5; color: #fff; }
+    .opcion[aria-checked="true"]::before { background: radial-gradient(circle, #21A121 38%, #fff 44%); }
+    .dialogo-pie { gap: 8px; }
 
-    /* ── Error ───────────────────────────────────────────────────── */
-    .error-banner {
-      display: none;
-      background: #FFF5F5;
-      border: 1px solid #FFCDD2;
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      color: #C62828;
-      font-size: .9rem;
-    }
-    .error-banner.visible { display: block; }
+    /* ── Pantalla azul ──────────────────────────────────────────── */
+    .bsod { position: fixed; inset: 0; z-index: 200; background: #0000AA; color: #fff; padding: 7vh 8vw; overflow: auto; font: 15px/1.4 var(--f-mono); outline: none; }
+    .bsod[hidden] { display: none; }
+    .bsod pre { font: inherit; white-space: pre-wrap; max-width: 80ch; }
 
-    /* ── Footer ──────────────────────────────────────────────────── */
-    footer {
-      text-align: center;
-      padding: 16px;
-      font-size: .78rem;
-      color: var(--text-muted);
-      border-top: 1px solid var(--border);
-      background: var(--surface);
+
+    /* ── Markdown dentro del globo de Dosi ──────────────────────── */
+    .globo-texto { white-space: normal; }
+    .globo-texto p { margin: 0 0 .6em; }
+    .globo-texto ul, .globo-texto ol { margin: 0 0 .6em 1.35em; }
+    .globo-texto > :last-child { margin-bottom: 0; }
+    .globo-texto li { margin: .15em 0; }
+    .globo-texto strong { font-weight: 700; }
+    .globo-texto code { font: .88em var(--f-mono); background: #fff; border: 1px solid #CFCFA8; padding: 0 4px; }
+    .md-h { font-weight: 700; }
+
+    /* ── Login: volver a mostrarlo ──────────────────────────────── */
+    .bienvenida[hidden] { display: none; }
+    .bv-usuario.actual small { color: #FFF200; font-weight: 700; opacity: 1; }
+
+    /* ── Menú Inicio: pie con "Cerrar sesión" ───────────────────── */
+    .menu-pie { display: flex; justify-content: flex-end; align-items: center; padding: 4px 8px; }
+    .menu-pie-btn { display: inline-flex; align-items: center; gap: 8px; background: none; border: 0; color: var(--lu-txt); font: 12px var(--f-ui); padding: 4px 8px; border-radius: 3px; }
+    .menu-pie-btn:hover, .menu-pie-btn:focus-visible { background: rgba(255,255,255,.22); }
+    .mp-ico { width: 20px; height: 20px; border-radius: 3px; background: #E8832C; border: 1px solid #fff; display: grid; place-items: center; }
+    .mp-ico svg { width: 12px; height: 12px; }
+    .dlg-ico.pregunta { background: #2D6CDF; }
+
+    /* ── Papelera de reciclaje (ícono + ventana) ────────────────── */
+    .icono-img.papelera { background: #D6E6FA; }
+    .icono-img.papelera svg { width: 30px; height: 30px; }
+    .icono-img.papelera .papeles { display: none; }
+    .icono-img.papelera.llena .papeles { display: block; }
+    .papelera-win { width: min(540px, calc(100vw - 24px)); }
+    .pap-cuerpo { background: var(--beige); padding: 8px 10px 6px; }
+    .pap-barra { display: flex; gap: 8px; margin-bottom: 8px; }
+    .pap-fila { display: grid; grid-template-columns: 1fr 140px 64px; gap: 10px; align-items: center; padding: 5px 10px; font-size: .88rem; }
+    .pap-items { list-style: none; max-height: 232px; min-height: 96px; overflow: auto; }
+    .pap-items .pap-fila:hover { background: #E2ECFB; }
+    .pap-items .pap-fila.sel { background: #316AC5; color: #fff; }
+    .pap-nombre { overflow-wrap: anywhere; }
+    .pap-estado { padding: 6px 2px 2px; font-size: .8rem; color: #3a4460; }
+
+    /* ── Administrador de tareas ────────────────────────────────── */
+    .tm-win { width: min(500px, calc(100vw - 24px)); }
+    .tm-cuerpo { background: var(--beige); padding: 8px 10px 8px; }
+    .tm-tabs { display: flex; gap: 2px; position: relative; z-index: 1; margin-bottom: -1px; }
+    .tm-tab { padding: 4px 14px; border: 1px solid #919B9C; border-bottom: 0; border-radius: 3px 3px 0 0; background: #F4F3EE; font: .85rem var(--f-ui); color: #000; }
+    .tm-tab[aria-selected="true"] { background: #fff; font-weight: 700; padding-top: 6px; }
+    .tm-panel { background: #fff; border: 1px solid #919B9C; padding: 8px; }
+    .tm-fila { display: grid; grid-template-columns: var(--cols); gap: 8px; align-items: center; padding: 4px 8px; font-size: .85rem; }
+    .tm-items { list-style: none; height: 214px; overflow: auto; }
+    .tm-items .tm-fila:hover { background: #E2ECFB; }
+    .tm-items .tm-fila.sel { background: #316AC5; color: #fff; }
+    .tm-botones { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .tm-win .estado { margin-top: 0; }
+
+    /* ── Protector de pantalla: Dosi rebotando como el logo del DVD ─ */
+    .protector { position: fixed; inset: 0; z-index: 150; background: #000; overflow: hidden; cursor: none; }
+    .protector[hidden] { display: none; }
+    .rebote { position: absolute; left: 0; top: 0; will-change: transform; transition: filter .15s; }
+    .rebote .dosi { margin: 0; cursor: none; }
+    .protector-info { position: absolute; left: 14px; bottom: 12px; color: #7DFF9A; font: 13px var(--f-mono); }
+    .protector-flash { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%) rotate(-6deg); font: italic 800 clamp(2.4rem, 9vw, 6rem)/1 var(--f-display); color: #FFF200; text-shadow: 5px 5px 0 #FF2E63; pointer-events: none; animation: flashEsquina 1.4s ease-out forwards; }
+    @keyframes flashEsquina { 0% { opacity: 0; scale: .4; } 15% { opacity: 1; scale: 1.1; } 80% { opacity: 1; } 100% { opacity: 0; scale: 1; } }
+    .opciones.horizontal { grid-template-columns: repeat(3, 1fr); }
+    .prop-cuerpo .btn-xp.vista-previa { justify-self: start; margin-top: 6px; }
+
+    /* ── Móvil ──────────────────────────────────────────────────── */
+    @media (max-width: 760px) {
+      :root { --lado-w: 0px; }
+      .lateral { position: fixed; top: 0; bottom: auto; width: 100%; height: 50px; border-right: 0; border-bottom: 3px solid #000; z-index: 6; }
+      .marca { writing-mode: horizontal-tb; transform: none; font-size: 1.7rem; }
+      .iconos { top: 64px; }
+      .btn-ventana[data-accion="max"] { display: none; }
+      .dosi { width: 92px; }
+      .asistente { --cola: 40px; }
+      .globo-cuerpo { max-height: 34vh; }
+      .reloj { display: none; }
+      .tarea-btn .tarea-txt { display: none; }
+      .tarea-btn { width: 44px; justify-content: center; }
+      .bienvenida .bv-centro { flex-direction: column; gap: 20px; }
+      .bv-izq { text-align: center; padding: 0 20px; flex: none; }
+      .bv-linea { width: 55%; height: 2px; background: linear-gradient(90deg, transparent, #B3C6F6, transparent); }
+      .bv-usuario { margin-left: 0; }
     }
-    footer a { color: var(--brand); text-decoration: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .carga i { width: 120px; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-mark">D+</div>
-  <h1>DOMUS+ &nbsp;<span>Consultor de Vacunas</span></h1>
-</header>
-
-<main>
-
-  <div class="intro">
-    <strong>¿Qué querés saber sobre vacunas?</strong><br>
-    Podés preguntar sobre el Calendario Nacional de Vacunación de Argentina,
-    vacunas específicas para bebés, niños, adultos y personas mayores,
-    o sobre la vacunación de <strong>perros y gatos</strong>.
-    Las respuestas se generan con IA a partir de fuentes oficiales.
-  </div>
-
-  <!-- Sugerencias -->
-  <div>
-    <p class="sugerencias-label">Preguntas frecuentes</p>
-    <div class="chips" id="chips">
-      <button class="chip">¿Cuándo se aplica la vacuna BCG?</button>
-      <button class="chip">¿Qué vacunas necesita mi perro?</button>
-      <button class="chip">¿La vacuna contra el HPV es obligatoria?</button>
-      <button class="chip">¿Cuántas dosis tiene la vacuna contra la hepatitis B?</button>
-      <button class="chip">¿Qué vacunas necesita un gato?</button>
-      <button class="chip">¿Qué es la vacuna quíntuple?</button>
+<!-- Pantalla de bienvenida (también desbloquea el audio del navegador) -->
+<div class="bienvenida" id="bienvenida">
+  <div class="bv-top"></div>
+  <div class="bv-centro">
+    <div class="bv-izq">
+      <h1>DOMUS<b>+</b></h1>
+      <p>Para comenzar, elegí tu nombre de usuario</p>
     </div>
-  </div>
-
-  <!-- Campo de pregunta -->
-  <div class="search-box">
-    <textarea
-      id="pregunta"
-      placeholder="Escribí tu pregunta sobre vacunación..."
-      rows="3"
-    ></textarea>
-    <div class="search-footer">
-      <span class="hint">La clave de API permanece en el servidor — nunca se expone al navegador.</span>
-      <button id="btn-enviar" onclick="consultar()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-        Consultar
+    <div class="bv-linea"></div>
+    <div class="bv-usuarios" role="group" aria-label="Elegí un usuario">
+      <button class="bv-usuario" type="button" data-usuario="dosi">
+        <span class="bv-avatar dosi" aria-hidden="true">D+</span>
+        <span class="bv-nombre">Dosi<small>Consultor de vacunas</small></span>
+      </button>
+      <button class="bv-usuario" type="button" data-usuario="alan">
+        <span class="bv-avatar" aria-hidden="true"><img src="imgs/avatares/alan.jpg" alt="" /></span>
+        <span class="bv-nombre">Alan Acevedo<small>Usuario</small></span>
+      </button>
+      <button class="bv-usuario" type="button" data-usuario="agustina">
+        <span class="bv-avatar" aria-hidden="true"><img class="pixel" src="imgs/avatares/agustina.png" alt="" /></span>
+        <span class="bv-nombre">Agustina Di Pasquale<small>Usuario</small></span>
+      </button>
+      <button class="bv-usuario" type="button" data-usuario="ilan">
+        <span class="bv-avatar" aria-hidden="true"><img src="imgs/avatares/ilan.jpg" alt="" /></span>
+        <span class="bv-nombre">Ilan Pitashny<small>Usuario</small></span>
       </button>
     </div>
   </div>
+  <div class="bv-bajo">Prácticas Profesionalizantes II · IES Santa Fe</div>
+</div>
 
-  <!-- Spinner -->
-  <div class="spinner" id="spinner">
-    <div class="spin-ring"></div>
-    Buscando en la base de conocimiento...
-  </div>
+<!-- Escritorio: Bliss dithereado + estrellas -->
+<div class="fondo" id="fondo" data-fondo="bliss" aria-hidden="true">
+  <span class="nube a"></span><span class="nube b"></span>
+  <svg class="colina" viewBox="0 0 1440 400" preserveAspectRatio="none">
+    <defs><linearGradient id="verdeColina" x1="0" y1="0" x2="0" y2="1"><stop class="sc1" offset="0"/><stop class="sc2" offset="1"/></linearGradient></defs>
+    <path d="M0 150 C 260 40 560 20 860 110 S 1250 150 1440 70 V400 H0 Z" fill="url(#verdeColina)"/>
+  </svg>
+  <svg class="estrella a" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.2l7.1-.6z" fill="#FFF200" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  <svg class="estrella b" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.2l7.1-.6z" fill="#FF5C7C" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  <svg class="estrella c" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.2l7.1-.6z" fill="#00BFFF" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+  <svg class="estrella d" viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.2l7.1-.6z" fill="#3EE06A" stroke="#000" stroke-width="1.6" stroke-linejoin="round"/></svg>
+</div>
 
-  <!-- Error -->
-  <div class="error-banner" id="error"></div>
+<header class="lateral">
+  <span class="marca">DOMUS<b>+</b></span>
+</header>
 
-  <!-- Resultado -->
-  <div id="resultado">
-    <div class="card">
-      <div class="card-header">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-        Respuesta
-      </div>
-      <div class="card-body" id="respuesta-texto"></div>
+<nav class="iconos" aria-label="Escritorio">
+  <button class="icono" type="button" data-abrir="app"><span class="icono-img app" aria-hidden="true">D+</span>Consultor de vacunas</button>
+  <button class="icono" type="button" data-abrir="acerca"><span class="icono-img info" aria-hidden="true">i</span>Acerca de DOMUS+</button>
+  <button class="icono" type="button" data-abrir="papelera"><span class="icono-img papelera" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><g class="papeles"><path d="M10 10l3-7 7 2-3 6" fill="#fff"/><path d="M15 9l6-4 4 5-3 4" fill="#FFF200"/></g><path d="M7 11h18l-2 17H9z" fill="#9DB3C4"/><path d="M5 11h22"/><path d="M12 15v9M16 15v9M20 15v9"/></svg></span>Papelera de reciclaje</button>
+</nav>
+
+<main>
+  <!-- Ventana principal -->
+  <section class="ventana app inactiva" id="v-app" aria-label="DOMUS+ Consultor de vacunas">
+    <div class="titulo">
+      <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+      <span class="titulo-txt">DOMUS+ · Consultor de vacunas</span>
+      <span class="rayas" aria-hidden="true"></span>
+      <button class="btn-ventana" type="button" data-accion="min" aria-label="Minimizar"><svg viewBox="0 0 12 12"><rect x="1" y="8" width="7" height="3" fill="#fff"/></svg></button>
+      <button class="btn-ventana" type="button" data-accion="max" aria-label="Maximizar o restaurar">
+        <svg class="i-max" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2"><rect x="1.5" y="1.5" width="9" height="9"/></svg>
+        <svg class="i-rest" viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.8"><path d="M4 1.5h6.5V8M1.5 4h6.5v6.5H1.5z"/></svg>
+      </button>
+      <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
     </div>
 
-    <div class="card" id="fuentes-card">
-      <div class="card-header">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z"/>
-          <path d="M8 7h8M8 11h8M8 15h5"/>
-        </svg>
-        Fuentes consultadas
-      </div>
-      <div class="card-body" id="fuentes-lista"></div>
-    </div>
-  </div>
+    <div class="cuerpo">
+      <!-- Panel de tareas -->
+      <nav class="tareas" aria-label="Preguntas por etapa">
+        <div class="grupo">
+          <h2>Calendario por edad</h2>
+          <div class="grupo-cuerpo">
+            <ol class="secuencia" id="etapas">
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas se aplican al nacer?">Al nacer</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden a los 2 meses?">2 meses</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden a los 4 meses?">4 meses</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden a los 6 meses?">6 meses</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden a los 12 meses?">12 meses</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden al ingreso escolar, a los 5 o 6 años?">5 a 6 años</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas corresponden a los 11 años?">11 años</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas necesita una persona adulta?">Adultos</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas se recomiendan durante el embarazo?">Embarazo</button></li>
+            </ol>
+          </div>
+        </div>
+        <div class="grupo">
+          <h2>Mascotas</h2>
+          <div class="grupo-cuerpo">
+            <ul class="secuencia mascotas">
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas necesita mi perro?">Perros</button></li>
+              <li><button class="tarea-link" type="button" data-q="¿Qué vacunas necesita un gato?">Gatos</button></li>
+            </ul>
+          </div>
+        </div>
+        <div class="grupo detalle-grupo">
+          <h2>Detalles</h2>
+          <div class="grupo-cuerpo detalle">
+            <b>Base de conocimiento</b>
+            21 fuentes: Argentina.gob.ar, Royal Canin Argentina y WebMD.
+          </div>
+        </div>
+      </nav>
 
+      <!-- Contenido -->
+      <div class="contenido">
+        <div class="hero">
+          <h1>Preguntale a Dosi</h1>
+          <p>Calendario Nacional de Vacunación de Argentina, y vacunas de perros y gatos.</p>
+          <span class="sticker" aria-hidden="true">con fuentes<br>oficiales</span>
+          <svg class="carita" viewBox="0 0 80 80" fill="none" stroke="#000" stroke-width="3" aria-hidden="true">
+            <circle cx="40" cy="40" r="36"/><ellipse cx="28" cy="31" rx="3.5" ry="6" fill="#000"/><ellipse cx="52" cy="31" rx="3.5" ry="6" fill="#000"/><path d="M22 48 Q40 66 58 48" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <div class="consulta">
+          <label for="pregunta">Tu pregunta sobre vacunación</label>
+          <div class="campo">
+            <textarea id="pregunta" rows="3" placeholder="Escribí tu pregunta o elegí una etapa del calendario..."></textarea>
+            <div class="campo-pie">
+              <span class="ayuda">Enter para enviar · Shift + Enter para salto de línea</span>
+              <button class="btn-xp principal" id="btn-enviar" type="button">
+                <span class="ir" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+                Preguntar
+              </button>
+            </div>
+          </div>
+          <p class="aviso">La información es orientativa. Consultá a tu profesional de salud o veterinario.</p>
+        </div>
+
+        <section id="fuentes-card" aria-label="Fuentes consultadas">
+          <h2><i></i>Archivos consultados por Dosi</h2>
+          <div class="lista">
+            <div class="lista-cab" aria-hidden="true"><span>Nombre</span><span>Sección</span><span>Coincidencia</span></div>
+            <ol id="fuentes-lista"></ol>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="estado">
+      <span>Dosi está en línea</span>
+      <span>DOMUS+ · Prácticas Profesionalizantes II · IES Santa Fe</span>
+    </div>
+
+    <i class="rz n" data-dir="n"></i><i class="rz s" data-dir="s"></i><i class="rz e" data-dir="e"></i><i class="rz w" data-dir="w"></i>
+    <i class="rz ne" data-dir="ne"></i><i class="rz nw" data-dir="nw"></i><i class="rz se" data-dir="se"></i><i class="rz sw" data-dir="sw"></i>
+  </section>
 </main>
 
-<footer>
-  DOMUS+ · Prácticas Profesionalizantes II · IES Santa Fe
-  &nbsp;|&nbsp; La información es orientativa. Consultá a tu profesional de salud o veterinario.
-</footer>
+<!-- Dosi: asistente flotante -->
+<div class="asistente">
+  <div class="globo" id="globo" role="presentation" hidden>
+    <button class="globo-x" id="globo-x" type="button" aria-label="Ocultar el globo de Dosi">×</button>
+    <div class="globo-cuerpo">
+      <p class="globo-texto" id="globo-texto" aria-hidden="true"></p>
+      <div class="carga" aria-hidden="true"><i></i></div>
+    </div>
+    <span class="globo-fin" aria-hidden="true">▼</span>
+  </div>
+
+  <button class="dosi" id="dosi" type="button" aria-label="Tocá a Dosi para que hable. Arrastralo, o usá las flechas, para moverlo">
+    <svg viewBox="0 0 200 270" data-estado="idle" data-boca="cerrada" data-mascota="" data-travesura="" id="dosi-svg" aria-hidden="true">
+      <defs><clipPath id="clip-barril"><rect x="67" y="63" width="66" height="130" rx="10"/></clipPath></defs>
+
+      <g class="embolo">
+        <rect x="58" y="6" width="84" height="16" rx="8" fill="#FF5C7C" stroke="#000" stroke-width="4"/>
+        <rect x="66" y="9.5" width="68" height="3" rx="1.5" fill="#FFB3C0" opacity=".9"/>
+        <rect x="64" y="17" width="72" height="2.5" rx="1.25" fill="#B8284A"/>
+        <rect x="95" y="22" width="10" height="36" fill="#9DB3C4" stroke="#000" stroke-width="3.5"/>
+      </g>
+
+      <g fill="none" stroke="#000" stroke-width="5" stroke-linecap="round">
+        <g class="brazo-izq"><path d="M62 140 Q44 142 36 128"/><circle cx="36" cy="126" r="6" fill="#FFF200"/></g>
+        <g class="brazo-der"><path d="M138 140 Q156 150 160 166"/><circle cx="160" cy="168" r="6" fill="#FFF200"/></g>
+      </g>
+
+      <rect x="62" y="58" width="76" height="140" rx="14" fill="#F4FBFF" stroke="#000" stroke-width="5"/>
+      <g clip-path="url(#clip-barril)">
+        <rect x="60" y="96" width="80" height="100" fill="#3EE06A"/>
+        <rect x="72" y="104" width="8" height="38" rx="4" fill="#fff" opacity=".45"/>
+        <rect x="116" y="63" width="22" height="132" fill="#000" opacity=".08"/>
+        <rect x="121" y="96" width="16" height="100" fill="#1FA04A" opacity=".55"/>
+        <g class="brillo"><rect x="71" y="68" width="5" height="122" rx="2.5" fill="#fff" opacity=".6"/></g>
+      </g>
+      <g stroke="#000" stroke-width="3" stroke-linecap="round" opacity=".55">
+        <path d="M122 72h10M122 84h6M122 96h10M122 108h6M122 120h10M122 132h6M122 144h10M122 156h6M122 168h10M122 180h6"/>
+      </g>
+      <rect x="46" y="52" width="108" height="12" rx="6" fill="#fff" stroke="#000" stroke-width="4.5"/>
+      <rect x="53" y="58.5" width="94" height="2.5" rx="1.25" fill="#000" opacity=".16"/>
+
+      <g class="oreja-perro" fill="#C98B5B" stroke="#000" stroke-width="4.5" stroke-linejoin="round">
+        <path d="M64 66 Q36 64 38 104 Q58 104 64 86Z"/><path d="M136 66 Q164 64 162 104 Q142 104 136 86Z"/>
+      </g>
+      <g class="oreja-gato" fill="#F2A65A" stroke="#000" stroke-width="4.5" stroke-linejoin="round">
+        <path d="M66 54 L70 30 L90 54Z"/><path d="M134 54 L130 30 L110 54Z"/>
+      </g>
+
+      <g class="cara">
+        <g class="ojos">
+          <circle cx="84" cy="124" r="11" fill="#fff" stroke="#000" stroke-width="3.5"/>
+          <circle cx="116" cy="124" r="11" fill="#fff" stroke="#000" stroke-width="3.5"/>
+          <g class="pupilas" fill="#000"><circle cx="85" cy="126" r="4.8"/><circle cx="115" cy="126" r="4.8"/></g>
+        </g>
+        <g class="cejas" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round">
+          <path d="M72 105 Q84 97 96 104"/><path d="M104 104 Q116 97 128 105"/>
+        </g>
+        <g class="cejas-error" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round">
+          <path d="M72 103l22 7"/><path d="M128 103l-22 7"/>
+        </g>
+        <circle cx="74" cy="148" r="6" fill="#FF7A66" opacity=".55"/>
+        <circle cx="126" cy="148" r="6" fill="#FF7A66" opacity=".55"/>
+        <path class="boca-sonrisa" d="M89 148 Q100 164 111 148" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round"/>
+        <g class="boca-abierta">
+          <path d="M91 148 Q100 170 109 148 Z" fill="#000" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M95 160 Q100 156 105 160 Q100 166 95 160Z" fill="#FF7A66"/>
+        </g>
+      </g>
+      <path class="sudor" d="M146 100 q7 10 0 15 q-7 -5 0 -15z" fill="#8FD3F0" stroke="#000" stroke-width="2.5"/>
+
+      <path d="M80 198h40l-8 18H88z" fill="#9DB3C4" stroke="#000" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M97.5 216h5v36l-2.5 8-2.5-8z" fill="#E6EEF4" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M122 246l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#FFF200" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+      <g class="zzz" aria-hidden="true"><text x="150" y="58">z</text><text x="160" y="40">Z</text><text x="172" y="20">Z</text></g>
+    </svg>
+  </button>
+</div>
+<div class="sr-only" id="sr-voz" aria-live="polite"></div>
+
+<!-- Menú Inicio -->
+<div class="menu-inicio" id="menu-inicio" hidden>
+  <div class="menu-cab"><i id="menu-avatar">D+</i><span id="menu-nombre">Dosi</span></div>
+  <div class="menu-cols">
+    <div>
+      <h3>Programas</h3>
+      <button class="menu-item fuerte" type="button" data-abrir="app">Consultor de vacunas</button>
+      <button class="menu-item" type="button" data-abrir="tareas">Administrador de tareas</button>
+      <h3>Preguntas frecuentes</h3>
+      <button class="menu-item" type="button" data-q="¿Cuándo se aplica la vacuna BCG?">¿Cuándo se aplica la vacuna BCG?</button>
+      <button class="menu-item" type="button" data-q="¿La vacuna contra el HPV es obligatoria?">¿La vacuna contra el HPV es obligatoria?</button>
+      <button class="menu-item" type="button" data-q="¿Cuántas dosis tiene la vacuna contra la hepatitis B?">¿Cuántas dosis tiene la vacuna contra la hepatitis B?</button>
+      <button class="menu-item" type="button" data-q="¿Qué es la vacuna quíntuple?">¿Qué es la vacuna quíntuple?</button>
+    </div>
+    <div>
+      <h3>Dosi</h3>
+      <button class="menu-item" type="button" data-abrir="papelera">Papelera de reciclaje</button>
+      <button class="menu-item" type="button" id="menu-sonido">Sonido: activado</button>
+      <button class="menu-item" type="button" id="menu-prop">Propiedades de pantalla</button>
+      <button class="menu-item" type="button" data-abrir="acerca">Acerca de DOMUS+</button>
+    </div>
+  </div>
+  <div class="menu-pie"><button class="menu-pie-btn" type="button" id="menu-logoff"><span class="mp-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H5v16h4M15 8l5 4-5 4M20 12H9"/></svg></span>Cerrar sesión</button></div>
+</div>
+
+<!-- Barra de tareas -->
+<div class="barra-tareas">
+  <button class="inicio" id="btn-inicio" type="button" aria-expanded="false" aria-controls="menu-inicio">
+    <span class="inicio-ico" aria-hidden="true">+</span>inicio
+  </button>
+  <div class="tareas-abiertas" id="tareas-abiertas"></div>
+  <div class="bandeja">
+    <span class="red" id="icono-red" role="img" aria-label="Conexión con el servidor: sin comprobar" title="Conexión con el servidor: sin comprobar"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="12" height="9" rx="1"/><rect x="9" y="11" width="12" height="9" rx="1"/></svg></span>
+    <button class="btn-sonido" id="btn-sonido" type="button" aria-pressed="true" aria-label="Sonido de Dosi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
+        <g class="ondas"><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></g>
+        <g class="x"><path d="m16 9 5 6M21 9l-5 6"/></g>
+      </svg>
+    </button>
+    <span class="reloj" id="reloj" aria-hidden="true">--/--/---- --:--:--</span>
+  </div>
+</div>
+
+
+<!-- Globo de la bandeja -->
+<div class="aviso-bandeja" id="aviso" role="status" hidden>
+  <button class="av-x" id="av-x" type="button" aria-label="Cerrar aviso">×</button>
+  <div class="av-cab"><span class="av-ico info" id="av-ico" aria-hidden="true">i</span><span id="av-titulo"></span></div>
+  <p class="av-txt" id="av-txt"></p>
+</div>
+
+<!-- Menús emergentes -->
+<div class="ctx" id="ctx" role="menu" hidden></div>
+<div class="ctx" id="menu-sistema" role="menu" hidden></div>
+
+<!-- Protector de pantalla -->
+<div class="protector" id="protector" hidden aria-hidden="true">
+  <div class="rebote" id="rebote"><div class="dosi"></div></div>
+  <p class="protector-info" id="protector-info"></p>
+</div>
+
+<!-- Pantalla azul -->
+<div class="bsod" id="bsod" role="alertdialog" aria-label="Pantalla azul de error" tabindex="-1" hidden>
+<pre>Se ha detectado un problema y DOMUS+ se ha cerrado para evitar daños en su consultorio de vacunas.
+
+SERVIDOR_NO_RESPONDE
+
+Si es la primera vez que ve esta pantalla de error, siga estos pasos:
+
+  * Compruebe que el servidor esté corriendo:        npm start
+  * Compruebe que la base de datos (Docker) esté activa:  docker start rag-db
+  * Compruebe que Ollama esté activo:                ollama serve
+
+Si esta pantalla aparece otra vez, pregunte a su profesor de Prácticas Profesionalizantes.
+
+Información técnica:
+
+*** STOP: 0x0000DB05 (0x00000001, 0x00000003, 0x00000000, 0x00000000)
+***  rag-vacunas.sys - Dirección F9A2C000 base en F9A29000, fecha 12/11/2026
+
+Presione cualquier tecla para continuar _</pre>
+</div>
 
 <script>
-  // Chips → llenar textarea
-  document.getElementById("chips").querySelectorAll(".chip").forEach((chip) => {
-    chip.addEventListener("click", () => {
-      document.getElementById("pregunta").value = chip.textContent.trim();
-      document.getElementById("pregunta").focus();
+  const $ = (id) => document.getElementById(id);
+  const sinMovimiento = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const movil = () => matchMedia("(max-width: 760px)").matches;
+  const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+  const guardado = {
+    leer(k, def) { try { const v = localStorage.getItem("domus-" + k); return v === null ? def : JSON.parse(v); } catch { return def; } },
+    poner(k, v) { try { localStorage.setItem("domus-" + k, JSON.stringify(v)); } catch {} },
+  };
+
+  /* ════════════════════════════════════════════════════════════════
+     SONIDOS  ·  carga sonidos/<nombre>.wav|mp3|ogg si existen;
+     si no, usa un sonido sintético de reemplazo (ver sonidos/LEEME.txt)
+     ════════════════════════════════════════════════════════════════ */
+  let ctx = null;
+  let sonido = true;
+  try { sonido = localStorage.getItem("dosi-sonido") !== "off"; } catch {}
+
+  function audio() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; } }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+
+  const NOMBRES = ["inicio", "ding", "error", "exclamacion", "globo", "minimizar", "restaurar", "menu", "clic", "notificacion", "tecla", "apagado", "vaciar"];
+  const crudos = {};
+  const buffers = {};
+  // nombres de archivo aceptados (el corto o el original de XP), en .wav/.mp3/.ogg
+  const ARCHIVOS = {
+    inicio: ["inicio", "startup", "Windows XP Startup"],
+    ding: ["ding", "Windows XP Ding"],
+    error: ["error", "Windows XP Error"],
+    exclamacion: ["exclamacion", "Windows XP Exclamation"],
+    globo: ["globo", "Windows XP Balloon"],
+    minimizar: ["minimizar", "Windows XP Minimize"],
+    restaurar: ["restaurar", "Windows XP Restore"],
+    menu: ["menu", "Windows XP Menu Command"],
+    clic: ["clic", "Windows XP Start"],
+    notificacion: ["notificacion", "notify", "Windows XP Notify"],
+    tecla: ["tecla"],
+    apagado: ["apagado", "shutdown", "Windows XP Shutdown", "Windows XP Logoff Sound"],
+    vaciar: ["vaciar", "recycle", "Windows XP Recycle"],
+  };
+  async function cargarSonido(n) {
+    for (const base of ARCHIVOS[n]) {
+      for (const ext of ["mp3", "wav", "ogg"]) {
+        try {
+          const r = await fetch(`sonidos/${encodeURIComponent(base)}.${ext}`);
+          if (r.ok) { crudos[n] = await r.arrayBuffer(); return; }
+        } catch { return; }          // file:// u offline: se usan los sintéticos
+      }
+    }
+  }
+  const cargados = Promise.all(NOMBRES.map(cargarSonido));
+
+  function tono(tipo, f0, f1, vol, dur) {
+    const c = ctx;
+    if (!sonido || !c || c.state !== "running") return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime;
+    o.type = tipo;
+    o.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.8);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.01);
+  }
+  const SINTETICO = {
+    inicio()      { [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => tono("sine", f, f, 0.08, 0.55), i * 170)); },
+    ding()        { tono("sine", 1046, 1046, 0.09, 0.35); setTimeout(() => tono("sine", 1568, 1568, 0.07, 0.4), 120); },
+    notificacion(){ SINTETICO.ding(); },
+    error()       { tono("square", 330, 165, 0.06, 0.25); setTimeout(() => tono("square", 247, 123, 0.06, 0.3), 190); },
+    exclamacion() { tono("triangle", 784, 523, 0.1, 0.25); },
+    globo()       { tono("sine", 1318, 1568, 0.07, 0.18); },
+    minimizar()   { tono("sine", 900, 300, 0.05, 0.16); },
+    restaurar()   { tono("sine", 300, 900, 0.05, 0.16); },
+    menu()        { tono("triangle", 1200, 1200, 0.04, 0.04); },
+    clic()        { tono("triangle", 1000, 1000, 0.03, 0.03); },
+    tecla()       { tono("triangle", 1800 + Math.random() * 700, 900, 0.025, 0.03); },
+    apagado()     { [784, 659, 523, 392].forEach((f, i) => setTimeout(() => tono("sine", f, f, 0.08, 0.5), i * 170)); },
+    vaciar()      { for (let i = 0; i < 6; i++) setTimeout(() => tono("square", 200 + Math.random() * 300, 80, 0.03, 0.05), i * 45); },
+  };
+
+  async function sonar(nombre) {
+    if (!sonido) return;
+    const c = audio();
+    if (!c) return;
+    await cargados;
+    if (c.state !== "running") { try { await c.resume(); } catch {} }
+    if (c.state !== "running") return;
+    if (!(nombre in buffers)) {
+      let b = null;
+      if (crudos[nombre]) { try { b = await c.decodeAudioData(crudos[nombre].slice(0)); } catch {} }
+      buffers[nombre] = b;
+    }
+    const b = buffers[nombre];
+    if (b) {
+      const s = c.createBufferSource(), g = c.createGain();
+      g.gain.value = 0.8;
+      s.buffer = b;
+      s.connect(g).connect(c.destination);
+      s.start();
+    } else {
+      SINTETICO[nombre]?.();
+    }
+  }
+
+  // voz de Dosi (blip estilo Undertale), independiente de los sonidos de Windows
+  const NOTAS = [588, 622, 659, 698];
+  function blip(ch) {
+    if (sinMovimiento) return;
+    const f = NOTAS[Math.floor(Math.random() * NOTAS.length)] * (ch === "?" ? 1.12 : 1);
+    tono("square", f, f, 0.045, 0.07);
+  }
+
+  function pintarSonido() {
+    $("btn-sonido").setAttribute("aria-pressed", String(sonido));
+    $("menu-sonido").textContent = sonido ? "Sonido: activado" : "Sonido: silencio";
+  }
+  function alternarSonido() {
+    sonido = !sonido;
+    try { localStorage.setItem("dosi-sonido", sonido ? "on" : "off"); } catch {}
+    pintarSonido();
+    if (sonido) sonar("clic");
+  }
+  $("btn-sonido").addEventListener("click", alternarSonido);
+  pintarSonido();
+
+  /* ── Reloj con sello de videocámara ──────────────────────────── */
+  const p2 = (n) => String(n).padStart(2, "0");
+  function reloj() {
+    const d = new Date();
+    $("reloj").textContent = `${p2(d.getDate())}/${p2(d.getMonth() + 1)}/${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`;
+  }
+  reloj(); setInterval(reloj, 1000);
+
+  /* ════════════════════════════════════════════════════════════════
+     GESTOR DE VENTANAS  ·  mover, redimensionar, minimizar, maximizar,
+     cerrar, foco y orden (z-index)
+     ════════════════════════════════════════════════════════════════ */
+  const MIN_W = 440, MIN_H = 340;
+  const gestor = { lista: [], activa: null };
+
+  function area() {
+    const m = movil();
+    const x = m ? 0 : 84, y = m ? 50 : 0;
+    return { x, y, w: innerWidth - x, h: innerHeight - 40 - y };
+  }
+
+  function ordenar() { gestor.lista.forEach((v, i) => { v.el.style.zIndex = 10 + i; }); }
+
+  function enfocar(v) {
+    if (!v || v.cerrada) return;
+    gestor.lista = gestor.lista.filter((x) => x !== v);
+    gestor.lista.push(v);
+    gestor.activa = v;
+    gestor.lista.forEach((x) => {
+      x.el.classList.toggle("inactiva", x !== v);
+      if (x.boton) x.boton.classList.toggle("activa", x === v && !x.min);
     });
+    if (v.boton) v.boton.classList.remove("aviso");
+    ordenar();
+  }
+  function desenfocar() {
+    gestor.activa = null;
+    gestor.lista.forEach((x) => { x.el.classList.add("inactiva"); if (x.boton) x.boton.classList.remove("activa"); });
+  }
+  function siguienteActiva() {
+    const v = [...gestor.lista].reverse().find((x) => !x.min && !x.cerrada);
+    if (v) enfocar(v); else gestor.activa = null;
+  }
+
+  function setRect(v, r) {
+    v.rect = r;
+    const s = v.el.style;
+    s.left = r.x + "px"; s.top = r.y + "px"; s.width = r.w + "px";
+    if (!v.o.autoAlto) s.height = r.h + "px";
+  }
+  function clampRect(v, r) {
+    const a = area();
+    const minW = v.o.minW ?? MIN_W;
+    const w = Math.min(Math.max(r.w, minW), a.w);
+    const h = v.o.autoAlto ? r.h : Math.min(Math.max(r.h, MIN_H), a.h);
+    const x = Math.min(Math.max(r.x, a.x - w + 120), a.x + a.w - 120);
+    const y = Math.min(Math.max(r.y, a.y), a.y + a.h - 34);
+    return { x, y, w, h };
+  }
+
+  function persistir(v) {
+    if (!v.o.clave || movil()) return;
+    const normal = v.estado === "max" ? (v.previo || v.rect) : v.rect;
+    guardado.poner("v-" + v.o.clave, { rect: normal, max: v.estado === "max" });
+  }
+
+  function crearBoton(v) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tarea-btn";
+    b.innerHTML = `<span class="tarea-ico" aria-hidden="true">+</span><span class="tarea-txt"></span>`;
+    b.querySelector(".tarea-txt").textContent = v.o.titulo;
+    b.setAttribute("aria-label", v.o.titulo);
+    b.addEventListener("click", () => {
+      if (v.min) restaurarMin(v);
+      else if (gestor.activa === v) minimizar(v);
+      else enfocar(v);
+    });
+    $("tareas-abiertas").appendChild(b);
+    return b;
+  }
+
+  function minimizar(v) {
+    if (!v.o.minimizable || v.min) return;
+    const r = v.el.getBoundingClientRect();
+    const b = v.boton.getBoundingClientRect();
+    v.el.style.setProperty("--dx", (b.left + b.width / 2) - (r.left + r.width / 2) + "px");
+    v.el.style.setProperty("--dy", (b.top + b.height / 2) - (r.top + r.height / 2) + "px");
+    v.min = true;
+    v.el.classList.add("minimizada");
+    v.boton.classList.remove("activa");
+    sonar("minimizar");
+    if (gestor.activa === v) siguienteActiva();
+  }
+  function restaurarMin(v) {
+    v.min = false;
+    v.el.classList.remove("minimizada");
+    enfocar(v);
+    sonar("restaurar");
+  }
+  function alternarMax(v) {
+    if (!v.o.maximizable || movil()) return;
+    if (v.estado === "max") {
+      v.estado = "normal";
+      v.el.classList.remove("maxi");
+      setRect(v, clampRect(v, v.previo || v.rect));
+    } else {
+      v.previo = { ...v.rect };
+      v.estado = "max";
+      v.el.classList.add("maxi");
+      setRect(v, area());
+    }
+    sonar("restaurar");
+    persistir(v);
+  }
+  function cerrar(v) {
+    v.cerrada = true;
+    if (v.o.autoAlto) {
+      v.el.remove();
+      gestor.lista = gestor.lista.filter((x) => x !== v);
+    } else {
+      v.el.classList.add("cerrada");
+      v.min = false;
+      v.el.classList.remove("minimizada");
+      if (v.boton) v.boton.hidden = true;
+    }
+    if (gestor.activa === v) siguienteActiva();
+    v.o.alCerrar?.();
+  }
+  function abrir(v) {
+    if (v.cerrada) {
+      v.cerrada = false;
+      v.el.classList.remove("cerrada");
+      if (v.boton) v.boton.hidden = false;
+      sonar("restaurar");
+    }
+    if (v.min) restaurarMin(v); else enfocar(v);
+  }
+
+  function crearVentana(el, o = {}) {
+    const v = { el, o, estado: "normal", min: false, cerrada: false, rect: { x: 0, y: 0, w: 0, h: 0 }, previo: null, boton: null };
+    gestor.lista.push(v);
+    if (o.boton) v.boton = crearBoton(v);
+
+    el.addEventListener("pointerdown", () => { if (!v.min) enfocar(v); }, true);
+
+    el.querySelectorAll("[data-accion]").forEach((b) => b.addEventListener("click", () => {
+      const a = b.dataset.accion;
+      if (a === "menu") abrirMenuSistema(v, b);
+      else if (a === "min") minimizar(v);
+      else if (a === "max") alternarMax(v);
+      else if (a === "cerrar") cerrar(v);
+    }));
+
+    const titulo = el.querySelector(".titulo");
+    titulo.addEventListener("dblclick", (e) => { if (!e.target.closest("button")) alternarMax(v); });
+
+    // arrastrar por la barra de título
+    titulo.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0 || e.target.closest("button") || movil()) return;
+      const sx = e.clientX, sy = e.clientY;
+      let r0 = { ...v.rect };
+      let iniciado = false;
+      titulo.setPointerCapture(e.pointerId);
+
+      const mover = (ev) => {
+        const dx = ev.clientX - sx, dy = ev.clientY - sy;
+        if (!iniciado) {
+          if (Math.hypot(dx, dy) < 4) return;
+          iniciado = true;
+          el.classList.add("arrastrando");
+          if (v.estado === "max") {                 // arrastrar una ventana maximizada la restaura
+            const p = v.previo || { w: 900, h: 600 };
+            const prop = (sx - v.rect.x) / v.rect.w;
+            v.estado = "normal";
+            el.classList.remove("maxi");
+            r0 = { x: sx - p.w * prop, y: sy - 16, w: p.w, h: p.h };
+          }
+        }
+        setRect(v, clampRect(v, { ...r0, x: r0.x + dx, y: r0.y + dy }));
+      };
+      const soltar = () => {
+        titulo.removeEventListener("pointermove", mover);
+        titulo.removeEventListener("pointerup", soltar);
+        titulo.removeEventListener("pointercancel", soltar);
+        el.classList.remove("arrastrando");
+        if (iniciado) persistir(v);
+      };
+      titulo.addEventListener("pointermove", mover);
+      titulo.addEventListener("pointerup", soltar);
+      titulo.addEventListener("pointercancel", soltar);
+    });
+
+    // redimensionar desde los bordes y esquinas
+    if (o.resizable) {
+      el.querySelectorAll(".rz").forEach((h) => h.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0 || v.estado !== "normal" || movil()) return;
+        e.preventDefault();
+        enfocar(v);
+        const dir = h.dataset.dir, r0 = { ...v.rect }, sx = e.clientX, sy = e.clientY, a = area();
+        h.setPointerCapture(e.pointerId);
+        el.classList.add("arrastrando");
+
+        const mover = (ev) => {
+          const dx = ev.clientX - sx, dy = ev.clientY - sy;
+          let { x, y, w, h: alto } = r0;
+          if (dir.includes("e")) w = Math.max(MIN_W, r0.w + dx);
+          if (dir.includes("s")) alto = Math.max(MIN_H, r0.h + dy);
+          if (dir.includes("w")) { w = Math.max(MIN_W, r0.w - dx); x = r0.x + (r0.w - w); }
+          if (dir.includes("n")) { alto = Math.max(MIN_H, r0.h - dy); y = r0.y + (r0.h - alto); }
+          if (y < a.y) { alto -= a.y - y; y = a.y; }
+          if (y + alto > a.y + a.h) alto = a.y + a.h - y;
+          setRect(v, { x, y, w, h: alto });
+        };
+        const soltar = () => {
+          h.removeEventListener("pointermove", mover);
+          h.removeEventListener("pointerup", soltar);
+          h.removeEventListener("pointercancel", soltar);
+          el.classList.remove("arrastrando");
+          persistir(v);
+        };
+        h.addEventListener("pointermove", mover);
+        h.addEventListener("pointerup", soltar);
+        h.addEventListener("pointercancel", soltar);
+      }));
+    }
+    return v;
+  }
+
+  // adaptar ventanas al tamaño del navegador (y al modo celular)
+  function ajustar() {
+    const a = area();
+    for (const v of gestor.lista) {
+      if (v.o.autoAlto) { setRect(v, clampRect(v, v.rect)); continue; }
+      if (movil()) {
+        if (v.estado !== "max") { v.previo = { ...v.rect }; v.estado = "max"; v.el.classList.add("maxi"); }
+        setRect(v, a);
+      } else if (v.estado === "max") setRect(v, a);
+      else setRect(v, clampRect(v, v.rect));
+    }
+  }
+  addEventListener("resize", ajustar);
+
+  // ── ventana principal ──
+  const elApp = $("v-app");
+  const vApp = crearVentana(elApp, {
+    titulo: "DOMUS+ · Consultor de vacunas", clave: "app", resizable: true, maximizable: true, minimizable: true, boton: true,
+    alCerrar: () => decir(`Cerraste la ventana. ${matchMedia("(pointer: coarse)").matches ? "Tocá" : "Hacé doble clic en"} el ícono "Consultor de vacunas" del escritorio, o abrilo desde el menú inicio, para volver a preguntar.`),
+  });
+  (function posicionInicial() {
+    const a = area();
+    const w = Math.min(900, a.w - 150 - 12);
+    const h = Math.min(a.h - 36, 680);
+    const g = guardado.leer("v-app", null);
+    if (g && g.rect && !movil()) {
+      setRect(vApp, clampRect(vApp, g.rect));
+      if (g.max) { vApp.previo = { ...vApp.rect }; vApp.estado = "max"; vApp.el.classList.add("maxi"); setRect(vApp, a); }
+    } else {
+      setRect(vApp, clampRect(vApp, { x: a.x + 130, y: 20, w, h }));
+    }
+    ajustar();
+  })();
+
+  // ── cuadros de diálogo ──
+  const ICONOS_DLG = { info: "i", error: "✕", alerta: "!", pregunta: "?" };
+  const SONIDO_DLG = { info: "ding", error: "error", alerta: "exclamacion", pregunta: "ding" };
+  let cascada = 0;
+  function dialogo({ titulo, icono = "info", texto, botones = null }) {
+    const el = document.createElement("section");
+    el.className = "ventana dialogo inactiva";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", titulo);
+    el.innerHTML = `
+      <div class="titulo">
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <span class="titulo-txt"></span>
+        <span class="rayas" aria-hidden="true"></span>
+        <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+      </div>
+      <div class="dialogo-cuerpo"><span class="dlg-ico ${icono}" aria-hidden="true">${ICONOS_DLG[icono]}</span><p></p></div>
+      <div class="dialogo-pie">${botones ? botones.map((b, i) => `<button class="btn-xp${b.principal ? " principal-d" : ""}" type="button" data-b="${i}"></button>`).join("") : `<button class="btn-xp" type="button" data-accion="cerrar">Aceptar</button>`}</div>`;
+    el.querySelector(".titulo-txt").textContent = titulo;
+    if (botones) el.querySelectorAll("[data-b]").forEach((b) => { b.textContent = botones[b.dataset.b].t; });
+    el.querySelector("p").textContent = texto;
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+
+    const v = crearVentana(el, { titulo, autoAlto: true, minW: 280 });
+    if (botones) el.querySelectorAll("[data-b]").forEach((b) => b.addEventListener("click", () => { const f = botones[b.dataset.b].on; cerrar(v); f?.(); }));
+    const a = area();
+    const w = Math.min(400, a.w - 24);
+    el.style.width = w + "px";
+    const h = el.offsetHeight;
+    cascada = (cascada + 1) % 5;
+    setRect(v, clampRect(v, { x: a.x + (a.w - w) / 2 + cascada * 26 - 52, y: a.y + (a.h - h) / 3 + cascada * 26 - 52, w, h }));
+    enfocar(v);
+    sonar(SONIDO_DLG[icono]);
+    (el.querySelector(".principal-d") || el.querySelector(".btn-xp")).focus();
+    return v;
+  }
+  const dialogoAcerca = () => dialogo({
+    titulo: "Acerca de DOMUS+",
+    icono: "info",
+    texto: "DOMUS+ · Consultor de vacunas\nProyecto de Prácticas Profesionalizantes II, IES Santa Fe.\n\nRespondo con fuentes de Argentina.gob.ar, Royal Canin Argentina y WebMD.\n\nLa información es orientativa: ante dudas, consultá a tu profesional de salud o veterinario.",
   });
 
-  // Enter (sin Shift) = enviar
-  document.getElementById("pregunta").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      consultar();
+  // abrir cosas por nombre (íconos del escritorio y menú Inicio)
+  function abrirPor(nombre) {
+    if (nombre === "app") abrir(vApp);
+    else if (nombre === "acerca") dialogoAcerca();
+    else if (nombre === "papelera") abrirPapelera();
+    else if (nombre === "tareas") abrirTareas();
+  }
+  document.querySelectorAll(".icono").forEach((b) => {
+    b.addEventListener("click", (e) => {
+      audio();
+      document.querySelectorAll(".icono").forEach((x) => x.classList.toggle("sel", x === b));
+      if (e.detail === 0 || matchMedia("(pointer: coarse)").matches) abrirPor(b.dataset.abrir);   // teclado o táctil: un toque
+    });
+    b.addEventListener("dblclick", () => abrirPor(b.dataset.abrir));
+  });
+  document.addEventListener("pointerdown", (e) => {     // clic en el escritorio: sin foco
+    if (!e.target.closest(".ventana, .barra-tareas, .menu-inicio, .asistente, .icono, .ctx, .aviso-bandeja")) {
+      desenfocar();
+      document.querySelectorAll(".icono").forEach((x) => x.classList.remove("sel"));
     }
   });
 
-  async function consultar() {
-    const pregunta = document.getElementById("pregunta").value.trim();
-    if (!pregunta) return;
+  /* ════════════════════════════════════════════════════════════════
+     DOSI
+     ════════════════════════════════════════════════════════════════ */
+  const svg = $("dosi-svg");
+  const globo = $("globo");
+  const texto = $("globo-texto");
+  const cuerpoGlobo = globo.querySelector(".globo-cuerpo");
 
-    // Limpiar estado anterior
-    setEstado("cargando");
+  const estado = (e) => { svg.dataset.estado = e; };
+  const boca = (abierta) => { svg.dataset.boca = abierta ? "abierta" : "cerrada"; };
+  function mostrarGlobo() {
+    if (globo.hidden) { globo.hidden = false; sonar("globo"); }
+  }
+
+  let turno = 0;
+  let saltar = null;
+  let ultimoMensaje = "";
+
+  /* ── Markdown mínimo (sin innerHTML): párrafos, listas, **negrita**, *cursiva*, `código` ── */
+  function inline(el, txt) {
+    const re = /(\*\*[^*]+\*\*|__[^_]+__|\*[^*\s][^*]*\*|`[^`]+`)/g;
+    let i = 0, m;
+    while ((m = re.exec(txt))) {
+      if (m.index > i) el.appendChild(document.createTextNode(txt.slice(i, m.index)));
+      const t = m[0];
+      let n;
+      if (t.startsWith("**") || t.startsWith("__")) { n = document.createElement("strong"); n.textContent = t.slice(2, -2); }
+      else if (t.startsWith("`")) { n = document.createElement("code"); n.textContent = t.slice(1, -1); }
+      else { n = document.createElement("em"); n.textContent = t.slice(1, -1); }
+      el.appendChild(n);
+      i = m.index + t.length;
+    }
+    if (i < txt.length) el.appendChild(document.createTextNode(txt.slice(i)));
+  }
+  function mdADom(msg) {
+    const frag = document.createDocumentFragment();
+    let lista = null, tipo = null, parrafo = [];
+    const cerrarParrafo = () => {
+      if (!parrafo.length) return;
+      const p = document.createElement("p");
+      parrafo.forEach((l, k) => { if (k) p.appendChild(document.createElement("br")); inline(p, l); });
+      frag.appendChild(p);
+      parrafo = [];
+    };
+    for (const l of msg.replace(/\r/g, "").split("\n")) {
+      if (!l.trim()) { cerrarParrafo(); lista = null; continue; }
+      const li = l.match(/^\s*([-*•]|\d+[.)])\s+(.*)$/);
+      const h = l.match(/^#{1,4}\s+(.*)$/);
+      if (li) {
+        cerrarParrafo();
+        const t = /\d/.test(li[1]) ? "ol" : "ul";
+        if (!lista || tipo !== t) { lista = document.createElement(t); tipo = t; frag.appendChild(lista); }
+        const e = document.createElement("li"); inline(e, li[2]); lista.appendChild(e);
+      } else if (h) {
+        cerrarParrafo(); lista = null;
+        const e = document.createElement("p"); e.className = "md-h"; inline(e, h[1]); frag.appendChild(e);
+      } else { lista = null; parrafo.push(l.trim()); }
+    }
+    cerrarParrafo();
+    return frag;
+  }
+  function nodosDeTexto(raiz) {
+    const w = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+    const out = [];
+    for (let n = w.nextNode(); n; n = w.nextNode()) out.push(n);
+    return out;
+  }
+  const mostrarInstantaneo = (msg) => texto.replaceChildren(mdADom(msg));
+
+  function decir(msg, { estadoFinal = "idle" } = {}) {
+    const mio = ++turno;
+    limpiarTravesura();
+    parar();
+    mostrarGlobo();
+    globo.classList.remove("listo");
+    ultimoMensaje = msg;
+    $("sr-voz").textContent = msg.replace(/[*_`#]/g, "");
+    texto.replaceChildren(mdADom(msg));
+    const nodos = nodosDeTexto(texto);
+    const completos = nodos.map((n) => n.data);
+
+    return new Promise((resolve) => {
+      let fin = false;     // al saltar el tipeo, el bucle no debe seguir pisando el texto completo
+      const terminar = () => {
+        if (mio !== turno) return resolve();
+        fin = true;
+        saltar = null;
+        nodos.forEach((n, k) => { n.data = completos[k]; });
+        boca(false);
+        estado(estadoFinal);
+        globo.classList.add("listo");
+        resolve();
+      };
+      if (sinMovimiento) return terminar();
+
+      nodos.forEach((n) => { n.data = ""; });
+      saltar = terminar;
+      estado("hablando");
+      const total = completos.reduce((a, c) => a + c.length, 0);
+      const base = Math.min(32, Math.max(9, 7000 / Math.max(total, 1)));
+      let k = 0, off = 0, i = 0;
+
+      (function paso() {
+        if (mio !== turno) return resolve();
+        if (fin) return;
+        while (k < nodos.length && off >= completos[k].length) { k++; off = 0; }
+        if (k >= nodos.length) return terminar();
+        const ch = completos[k][off++];
+        nodos[k].data = completos[k].slice(0, off);
+        i++;
+        cuerpoGlobo.scrollTop = cuerpoGlobo.scrollHeight;
+
+        if (/[\p{L}\p{N}]/u.test(ch)) {
+          if (i % 2 === 0) blip(ch);
+          boca(i % 2 === 0);
+        } else {
+          boca(false);
+        }
+        const pausa = /[.!?]/.test(ch) ? 240 : /[,;:]/.test(ch) ? 120 : /\n/.test(ch) ? 160 : 0;
+        setTimeout(paso, base + pausa);
+      })();
+    });
+  }
+
+  const FRASES_PENSANDO = ["Revisando el calendario…", "Buscando en las fuentes…", "Comparando fragmentos…", "Armando la respuesta…"];
+  let rotor = null;
+
+  function parar() {
+    clearInterval(rotor);
+    rotor = null;
+    globo.classList.remove("pensando");
+  }
+
+  function pensar() {
+    turno++;
+    saltar = null;
+    limpiarTravesura();
+    parar();
+    mostrarGlobo();
+    globo.classList.remove("listo");
+    globo.classList.add("pensando");
+    let k = 0;
+    texto.textContent = FRASES_PENSANDO[0];
+    $("sr-voz").textContent = "Dosi está buscando la respuesta";
+    if (!sinMovimiento) {
+      rotor = setInterval(() => {
+        k = Math.min(k + 1, FRASES_PENSANDO.length - 1);
+        texto.textContent = FRASES_PENSANDO[k];
+      }, 1700);
+    }
+    boca(false);
+    estado("pensando");
+  }
+
+  globo.addEventListener("click", () => saltar && saltar());
+  $("globo-x").addEventListener("click", (e) => { e.stopPropagation(); globo.hidden = true; });
+
+  const FRASES = [
+    "¡Hola! Soy Dosi. Mi aguja es chiquita, pero mis ganas de ayudar son enormes.",
+    "¡Cada dosis suma! Vacunarse es cuidarte a vos y a los que querés.",
+    "Preguntame sobre el calendario de vacunación, o sobre perros y gatos. ¡Me encanta!",
+    "Yo me ocupo de las fuentes oficiales. Vos ocupate de mirar el calendario. ¡Equipo!",
+  ];
+  let ultimaFrase = -1;
+  $("dosi").addEventListener("click", () => {
+    if (evitarClic) return;
+    audio();
+    if (globo.hidden && ultimoMensaje) {          // volver a mostrar lo último que dijo
+      globo.hidden = false;
+      sonar("globo");
+      mostrarInstantaneo(ultimoMensaje);
+      globo.classList.add("listo");
+      return;
+    }
+    let n;
+    do { n = Math.floor(Math.random() * FRASES.length); } while (n === ultimaFrase);
+    ultimaFrase = n;
+    $("fuentes-card").classList.remove("visible");
+    decir(FRASES[n]);
+  });
+
+  /* ── Menú Inicio ─────────────────────────────────────────────── */
+  const menu = $("menu-inicio");
+  function abrirMenu(v) { menu.hidden = !v; $("btn-inicio").setAttribute("aria-expanded", String(v)); }
+  $("btn-inicio").addEventListener("click", (e) => { e.stopPropagation(); audio(); sonar("clic"); abrirMenu(menu.hidden); });
+  document.addEventListener("click", (e) => { if (!menu.hidden && !menu.contains(e.target)) abrirMenu(false); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!menu.hidden) { abrirMenu(false); return; }
+    const dlg = [...gestor.lista].reverse().find((x) => x.o.autoAlto);
+    if (dlg) cerrar(dlg);
+    else if (saltar) saltar();
+  });
+  $("menu-sonido").addEventListener("click", alternarSonido);
+  menu.querySelectorAll("[data-abrir]").forEach((b) =>
+    b.addEventListener("click", () => { abrirMenu(false); sonar("menu"); abrirPor(b.dataset.abrir); }));
+
+  /* ── Consulta ────────────────────────────────────────────────── */
+  function preguntar(q) {
+    if (vApp.cerrada) abrir(vApp);
+    $("pregunta").value = q;
+    consultar();
+  }
+  document.querySelectorAll("[data-q]").forEach((b) =>
+    b.addEventListener("click", () => { if (menu.contains(b)) { abrirMenu(false); sonar("menu"); } preguntar(b.dataset.q); }));
+
+  $("pregunta").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); consultar(); }
+  });
+  $("btn-enviar").addEventListener("click", consultar);
+
+  async function consultar() {
+    const pregunta = $("pregunta").value.trim();
+    if (!pregunta || $("btn-enviar").disabled) return;
+
+    audio();
+    svg.dataset.mascota = /perr|cachorr|can[ií]n|\bgat|felin/i.test(pregunta)
+      ? (/\bgat|felin/i.test(pregunta) ? "gato" : "perro") : "";
+    $("fuentes-card").classList.remove("visible");
+    $("btn-enviar").disabled = true;
+    pensar();
 
     try {
       const resp = await fetch("/preguntar", {
@@ -400,73 +1756,937 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ pregunta }),
       });
-
       if (!resp.ok) {
-        const err = await resp.json();
+        const err = await resp.json().catch(() => ({}));
         throw new Error(err.error || `Error ${resp.status}`);
       }
-
       const { respuesta, fuentes } = await resp.json();
-      mostrarResultado(respuesta, fuentes);
+      fallosRed = 0;
+      redEstado(true);
+      $("btn-enviar").disabled = false;
+      guardarConsulta(pregunta, (fuentes ?? []).length);
+      await decir(respuesta);
+      mostrarFuentes(fuentes ?? []);
     } catch (err) {
-      setEstado("error", err.message);
-    }
-  }
-
-  function setEstado(estado, msg = "") {
-    document.getElementById("spinner").classList.toggle("visible", estado === "cargando");
-    document.getElementById("btn-enviar").disabled = estado === "cargando";
-    document.getElementById("resultado").classList.toggle("visible", false);
-    const errEl = document.getElementById("error");
-    errEl.classList.toggle("visible", estado === "error");
-    if (estado === "error") errEl.textContent = "⚠️ " + msg;
-  }
-
-  function mostrarResultado(respuesta, fuentes) {
-    document.getElementById("respuesta-texto").innerHTML = marked.parse(respuesta);
-
-    const listaEl = document.getElementById("fuentes-lista");
-    listaEl.innerHTML = "";
-    document.getElementById("fuentes-card").style.display =
-      fuentes.length ? "block" : "none";
-
-    if (fuentes.length) {
-      const ul = document.createElement("div");
-      ul.className = "fuentes-lista";
-      fuentes.forEach((f, i) => {
-        const item = document.createElement("div");
-        item.className = "fuente-item";
-
-        const dist = typeof f.distancia === "number"
-          ? (1 - f.distancia / 2).toFixed(2)   // convertir distancia coseno a similitud aprox
-          : null;
-
-        item.innerHTML = `
-          <div class="fuente-num">${i + 1}</div>
-          <div class="fuente-txt">
-            <span class="fuente-origen">${esc(f.fuente ?? "")}</span>
-            ${f.seccion ? `<br><span class="fuente-seccion">${esc(f.seccion)}</span>` : ""}
-          </div>
-          ${dist !== null ? `<span class="fuente-dist">sim. ${dist}</span>` : ""}
-        `;
-        ul.appendChild(item);
+      $("btn-enviar").disabled = false;
+      if (err instanceof TypeError) { fallosRed++; redEstado(false); } else fallosRed = 0;   // sin respuesta del servidor
+      if (fallosRed >= 2) { pantallaAzul(); return; }
+      decir("Algo falló y no pude responderte. Mirá el aviso en pantalla.", { estadoFinal: "error" });
+      dialogo({
+        titulo: "DOMUS+",
+        icono: "error",
+        texto: `No se pudo obtener la respuesta.\n\n${err.message}\n\nRevisá que el servidor, la base de datos y Ollama estén corriendo, y volvé a preguntar.`,
       });
-      listaEl.appendChild(ul);
     }
+  }
 
-    document.getElementById("spinner").classList.remove("visible");
-    document.getElementById("btn-enviar").disabled = false;
-    document.getElementById("error").classList.remove("visible");
-    document.getElementById("resultado").classList.add("visible");
+  function mostrarFuentes(fuentes) {
+    const lista = $("fuentes-lista");
+    lista.innerHTML = "";
+    if (!fuentes.length) return;
 
-    // Scroll suave al resultado
-    document.getElementById("resultado").scrollIntoView({ behavior: "smooth", block: "start" });
+    fuentes.forEach((f, i) => {
+      const sim = typeof f.distancia === "number"
+        ? Math.max(0, Math.min(1, 1 - f.distancia / 2))   // distancia coseno → similitud aprox.
+        : null;
+      const pct = sim === null ? null : Math.round(sim * 100);
+      const li = document.createElement("li");
+      li.className = "fila";
+      li.style.setProperty("--demora", `${i * 140}ms`);
+      li.innerHTML = `
+        <span class="fila-nombre">${esc(f.fuente ?? "")}</span>
+        <span class="fila-sec">${esc(f.seccion ?? "")}</span>
+        ${pct !== null
+          ? `<span class="pb"><span class="pb-barra"><i style="width:${pct}%"></i></span><span class="pb-pct">${pct}%</span></span>`
+          : "<span></span>"}
+      `;
+      lista.appendChild(li);
+    });
+    $("fuentes-card").classList.add("visible");
+    sonar("notificacion");
+    if (vApp.min || gestor.activa !== vApp) {
+      vApp.boton.classList.add("aviso");   // el botón parpadea en naranja
+      avisar("Respuesta lista", `Dosi encontró ${fuentes.length} ${fuentes.length === 1 ? "fuente" : "fuentes"}. Tocá acá para verla.`, { alClic: () => abrir(vApp) });
+    }
+    $("fuentes-card").scrollIntoView({ behavior: sinMovimiento ? "auto" : "smooth", block: "nearest" });
   }
 
   function esc(str) {
-    return str.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
+
+  /* ── Profundidad: Dosi mira al cursor; las estrellas se mueven a distinto ritmo ── */
+  if (!sinMovimiento) {
+    const raiz = document.documentElement;
+    const clamp = (v) => Math.max(-1, Math.min(1, v));
+    const meta = { px: 0, py: 0, tx: 0, ty: 0 };
+    const actual = { px: 0, py: 0, tx: 0, ty: 0 };
+    let raf = 0;
+
+    function avanzar() {
+      let sigue = false;
+      for (const k in meta) {
+        const d = meta[k] - actual[k];
+        if (Math.abs(d) > 0.002) { actual[k] += d * 0.12; sigue = true; } else actual[k] = meta[k];
+        raiz.style.setProperty("--" + k, actual[k].toFixed(3));
+      }
+      raf = sigue ? requestAnimationFrame(avanzar) : 0;
+    }
+    const mover = () => { if (!raf) raf = requestAnimationFrame(avanzar); };
+
+    addEventListener("pointermove", (e) => {
+      const r = $("dosi").getBoundingClientRect();
+      meta.tx = clamp((e.clientX - (r.left + r.width / 2)) / 450);
+      meta.ty = clamp((e.clientY - (r.top + r.height * 0.4)) / 450);
+      meta.px = (e.clientX / innerWidth - 0.5) * 2;
+      meta.py = (e.clientY / innerHeight - 0.5) * 2;
+      mover();
+    }, { passive: true });
+    document.addEventListener("pointerleave", () => {
+      meta.px = meta.py = meta.tx = meta.ty = 0;
+      mover();
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     DOSI ARRASTRABLE  ·  el globo cambia de lado según dónde esté
+     ════════════════════════════════════════════════════════════════ */
+  const dosiEl = $("dosi");
+  const asis = document.querySelector(".asistente");
+  const dosiPos = { cx: 0, cy: 0, libre: false };
+  let arrastreDosi = null;
+  let evitarClic = false;
+
+  function medidasDosi() { const w = dosiEl.offsetWidth || 128; return { w, h: (w * 270) / 200 }; }
+  function colocarDosi(cx, cy) {
+    const { w, h } = medidasDosi();
+    const tope = movil() ? 56 : 8;
+    cx = clamp(cx, w / 2 + 6, innerWidth - w / 2 - 6);
+    cy = clamp(cy, h / 2 + tope, innerHeight - 40 - h / 2 - 6);
+    dosiPos.cx = cx; dosiPos.cy = cy;
+    const izq = cx < innerWidth / 2;
+    const arriba = cy - h / 2 - (movil() ? 50 : 0);
+    const abajoLibre = innerHeight - 40 - (cy + h / 2);
+    const abajo = arriba < 230 && abajoLibre > arriba;
+    asis.dataset.lado = izq ? "izq" : "der";
+    asis.dataset.vert = abajo ? "abajo" : "arriba";
+    const st = asis.style;
+    if (izq) { st.left = (cx - w / 2 - 4) + "px"; st.right = "auto"; st.maxWidth = (innerWidth - (cx - w / 2 - 4) - 8) + "px"; }
+    else { st.right = (innerWidth - (cx + w / 2) - 4) + "px"; st.left = "auto"; st.maxWidth = (cx + w / 2 + 4 - 8) + "px"; }
+    if (abajo) { st.top = (cy - h / 2) + "px"; st.bottom = "auto"; }
+    else { st.bottom = (innerHeight - (cy + h / 2)) + "px"; st.top = "auto"; }
+  }
+  function posicionarDosi() {
+    const g = guardado.leer("dosi", null);
+    if (g && typeof g.fx === "number") { dosiPos.libre = true; colocarDosi(g.fx * innerWidth, g.fy * innerHeight); return; }
+    const { w, h } = medidasDosi();
+    colocarDosi(innerWidth - 16 - 4 - w / 2, innerHeight - 40 - 12 - h / 2);
+  }
+  const guardarDosi = () => { dosiPos.libre = true; guardado.poner("dosi", { fx: dosiPos.cx / innerWidth, fy: dosiPos.cy / innerHeight }); };
+
+  dosiEl.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    arrastreDosi = { id: e.pointerId, dx: e.clientX - dosiPos.cx, dy: e.clientY - dosiPos.cy, x0: e.clientX, y0: e.clientY, activo: false };
+    try { dosiEl.setPointerCapture(e.pointerId); } catch {}
+  });
+  dosiEl.addEventListener("pointermove", (e) => {
+    const a = arrastreDosi;
+    if (!a || a.id !== e.pointerId) return;
+    if (!a.activo) {
+      if (Math.hypot(e.clientX - a.x0, e.clientY - a.y0) < 6) return;   // todavía es un clic
+      a.activo = true;
+      dosiEl.classList.add("arrastrando");
+    }
+    colocarDosi(e.clientX - a.dx, e.clientY - a.dy);
+  });
+  function finArrastreDosi() {
+    const a = arrastreDosi;
+    if (!a) return;
+    arrastreDosi = null;
+    dosiEl.classList.remove("arrastrando");
+    if (a.activo) { evitarClic = true; setTimeout(() => { evitarClic = false; }, 0); guardarDosi(); }
+  }
+  dosiEl.addEventListener("pointerup", finArrastreDosi);
+  dosiEl.addEventListener("pointercancel", finArrastreDosi);
+  dosiEl.addEventListener("keydown", (e) => {       // teclado: flechas
+    const paso = e.shiftKey ? 96 : 24;
+    const d = { ArrowLeft: [-paso, 0], ArrowRight: [paso, 0], ArrowUp: [0, -paso], ArrowDown: [0, paso] }[e.key];
+    if (!d) return;
+    e.preventDefault();
+    colocarDosi(dosiPos.cx + d[0], dosiPos.cy + d[1]);
+    guardarDosi();
+  });
+  addEventListener("resize", posicionarDosi);
+  posicionarDosi();
+
+  /* ════════════════════════════════════════════════════════════════
+     TRAVESURAS  ·  mira a los costados, se rasca, se duerme y despierta
+     ════════════════════════════════════════════════════════════════ */
+  let inactivo = 0;
+  let dormida = false;
+  let tvTimer = null;
+  const tv = (t) => { svg.dataset.travesura = t; };
+  function limpiarTravesura() { clearTimeout(tvTimer); dormida = false; tv(""); inactivo = 0; }
+  function despertar() {
+    dormida = false;
+    tv("despierta");
+    tvTimer = setTimeout(() => tv(""), 650);
+    if (!globo.hidden && !saltar) decir("¡Ay! ¡Me dormí un ratito! ¿Seguimos?");
+  }
+  let ultimaActividad = performance.now();
+  function actividad() { inactivo = 0; ultimaActividad = performance.now(); if (dormida) despertar(); }
+  ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"].forEach((n) => addEventListener(n, actividad, { passive: true }));
+  setInterval(() => {
+    if (sinMovimiento || document.hidden || dormida) return;
+    const ocupada = saltar || globo.classList.contains("pensando") || arrastreDosi || svg.dataset.estado !== "idle";
+    if (ocupada) { inactivo = 0; return; }
+    inactivo++;
+    if (inactivo === 50) { dormida = true; tv("dormir"); return; }
+    if ([9, 19, 29, 39].includes(inactivo)) {
+      tv(Math.random() < 0.5 ? "mirar" : "rascar");
+      clearTimeout(tvTimer);
+      tvTimer = setTimeout(() => { if (!dormida) tv(""); }, 2600);
+    }
+  }, 1000);
+
+  /* ════════════════════════════════════════════════════════════════
+     GLOBOS DE LA BANDEJA + ESTADO DE LA CONEXIÓN
+     ════════════════════════════════════════════════════════════════ */
+  let avisoT = null;
+  let avisoClic = null;
+  function avisar(titulo, texto, { icono = "info", alClic = null } = {}) {
+    const a = $("aviso");
+    $("av-ico").className = "av-ico " + icono;
+    $("av-ico").textContent = icono === "error" ? "✕" : "i";
+    $("av-titulo").textContent = titulo;
+    $("av-txt").textContent = texto;
+    avisoClic = alClic;
+    a.hidden = false;
+    sonar("globo");
+    clearTimeout(avisoT);
+    avisoT = setTimeout(() => { a.hidden = true; }, 8000);
+  }
+  $("aviso").addEventListener("click", () => { $("aviso").hidden = true; const f = avisoClic; avisoClic = null; f?.(); });
+  $("av-x").addEventListener("click", (e) => { e.stopPropagation(); $("aviso").hidden = true; });
+
+  let servidorOk = null;
+  function redEstado(ok) {
+    servidorOk = ok;
+    const r = $("icono-red");
+    r.className = "red " + (ok ? "ok" : "err");
+    const t = ok ? "Conexión con el servidor: activa" : "Conexión con el servidor: sin respuesta";
+    r.setAttribute("aria-label", t); r.title = t;
+  }
+  async function comprobarServidor() {
+    try {
+      const r = await fetch("/salud");
+      if (!r.ok) throw new Error("sin base de datos");
+      redEstado(true);
+      avisar("Conectado", "Se conectó a la base de conocimiento.");
+    } catch {
+      redEstado(false);
+      avisar("Sin conexión", "No hay respuesta del servidor o de la base de datos.", { icono: "error" });
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     MENÚS EMERGENTES  ·  clic derecho en el escritorio y menú de ventana
+     ════════════════════════════════════════════════════════════════ */
+  const menuCtx = $("ctx");
+  const menuSis = $("menu-sistema");
+  let anclaMenu = null;
+  function cerrarPopups(devolverFoco) {
+    const abierto = !menuCtx.hidden || !menuSis.hidden;
+    menuCtx.hidden = true; menuSis.hidden = true;
+    if (devolverFoco && abierto && anclaMenu && document.contains(anclaMenu)) anclaMenu.focus();
+  }
+  function abrirPopup(el, x, y, items) {
+    cerrarPopups();
+    el.innerHTML = "";
+    for (const it of items) {
+      if (it.sep) { el.appendChild(document.createElement("hr")); continue; }
+      const b = document.createElement("button");
+      b.type = "button"; b.setAttribute("role", "menuitem"); b.textContent = it.t;
+      if (it.fuerte) b.className = "fuerte";
+      if (it.off) b.disabled = true;
+      b.addEventListener("click", () => { cerrarPopups(false); sonar("menu"); it.on(); });
+      el.appendChild(b);
+    }
+    el.hidden = false;
+    const r = el.getBoundingClientRect();
+    el.style.left = clamp(x, 4, innerWidth - r.width - 4) + "px";
+    el.style.top = clamp(y, 4, innerHeight - 40 - r.height - 4) + "px";
+    el.querySelector("button:not(:disabled)")?.focus();
+  }
+  document.addEventListener("pointerdown", (e) => { if (!e.target.closest(".ctx")) cerrarPopups(); }, true);
+  document.addEventListener("keydown", (e) => {
+    const el = !menuCtx.hidden ? menuCtx : !menuSis.hidden ? menuSis : null;
+    if (!el) return;
+    const bs = [...el.querySelectorAll("button:not(:disabled)")];
+    const i = bs.indexOf(document.activeElement);
+    if (e.key === "ArrowDown") { e.preventDefault(); bs[(i + 1) % bs.length]?.focus(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); bs[(i - 1 + bs.length) % bs.length]?.focus(); }
+    else if (e.key === "Home") { e.preventDefault(); bs[0]?.focus(); }
+    else if (e.key === "End") { e.preventDefault(); bs[bs.length - 1]?.focus(); }
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); cerrarPopups(true); }
+    else if (e.key === "Tab") { cerrarPopups(false); }
+  }, true);
+
+  // clic derecho en el escritorio
+  document.addEventListener("contextmenu", (e) => {
+    if (e.target.closest(".ventana, .barra-tareas, .menu-inicio, .asistente, .ctx, .aviso-bandeja, .bienvenida, .bsod, textarea, input")) return;
+    e.preventDefault();
+    audio();
+    abrirMenu(false);
+    anclaMenu = null;
+    abrirPopup(menuCtx, e.clientX, e.clientY, [
+      { t: "Actualizar", on: actualizarEscritorio },
+      { sep: true },
+      { t: "Cambiar fondo de escritorio…", on: abrirPropiedades },
+      { t: "Propiedades", on: abrirPropiedades, fuerte: true },
+      { sep: true },
+      { t: "Acerca de DOMUS+", on: dialogoAcerca },
+    ]);
+  });
+  function actualizarEscritorio() {
+    const f = $("fondo");
+    f.classList.remove("refrescando"); void f.offsetWidth; f.classList.add("refrescando");
+    sonar("clic");
+    decir("¡Escritorio actualizado! Quedó igualito, pero con más onda.");
+  }
+
+  /* ── menú de ventana (ícono del título o Alt + Espacio) ── */
+  let modoTeclado = null;
+  function iniciarModo(v, tipo) {
+    modoTeclado = { v, tipo };
+    v.el.classList.add("arrastrando");
+    avisar(tipo === "mover" ? "Mover ventana" : "Cambiar tamaño", "Usá las flechas (con Shift, más rápido). Enter para terminar.");
+  }
+  document.addEventListener("keydown", (e) => {
+    if (!modoTeclado) return;
+    const { v, tipo } = modoTeclado;
+    if (e.key === "Enter" || e.key === "Escape") {
+      e.preventDefault(); e.stopPropagation();
+      modoTeclado = null; v.el.classList.remove("arrastrando"); persistir(v);
+      return;
+    }
+    const paso = e.shiftKey ? 64 : 16;
+    const d = { ArrowLeft: [-paso, 0], ArrowRight: [paso, 0], ArrowUp: [0, -paso], ArrowDown: [0, paso] }[e.key];
+    if (!d) return;
+    e.preventDefault(); e.stopPropagation();
+    const r = { ...v.rect };
+    if (tipo === "mover") { r.x += d[0]; r.y += d[1]; } else { r.w += d[0]; r.h += d[1]; }
+    setRect(v, clampRect(v, r));
+  }, true);
+
+  function abrirMenuSistema(v, ancla) {
+    anclaMenu = ancla;
+    const max = v.estado === "max", fijo = movil();
+    const items = [
+      { t: "Restaurar", on: () => { if (v.min) restaurarMin(v); else if (max) alternarMax(v); }, off: !(v.min || max) },
+      { t: "Mover", on: () => iniciarModo(v, "mover"), off: max || fijo || v.min },
+    ];
+    if (v.o.resizable) items.push({ t: "Tamaño", on: () => iniciarModo(v, "tam"), off: max || fijo || v.min });
+    if (v.o.minimizable) items.push({ t: "Minimizar", on: () => minimizar(v), off: v.min });
+    if (v.o.maximizable) items.push({ t: "Maximizar", on: () => alternarMax(v), off: max || fijo });
+    items.push({ sep: true }, { t: "Cerrar", on: () => cerrar(v), fuerte: true });
+    const r = ancla.getBoundingClientRect();
+    abrirPopup(menuSis, r.left, r.bottom + 2, items);
+  }
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey && e.code === "Space") {
+      const v = gestor.activa;
+      if (!v) return;
+      e.preventDefault();
+      audio();
+      abrirMenuSistema(v, v.el.querySelector(".titulo-icono"));
+    }
+  });
+
+  /* ════════════════════════════════════════════════════════════════
+     PROPIEDADES DE PANTALLA  ·  fondo de escritorio y combinación de colores
+     ════════════════════════════════════════════════════════════════ */
+  const FONDOS = [
+    { id: "bliss", nombre: "Bliss (colina)" },
+    { id: "atardecer", nombre: "Atardecer" },
+    { id: "noche", nombre: "Noche estrellada" },
+    { id: "rombos", nombre: "Rombos Y2K" },
+  ];
+  const TEMAS = [
+    { id: "luna", nombre: "Azul (predeterminado)" },
+    { id: "oliva", nombre: "Verde oliva" },
+    { id: "y2k", nombre: "Y2K amarillo ácido" },
+  ];
+  let fondoActual = guardado.leer("fondo", "bliss");
+  let temaActual = guardado.leer("tema", "luna");
+  const aplicarFondo = (id) => { $("fondo").dataset.fondo = id; };
+  const aplicarTema = (id) => { if (id === "luna") delete document.documentElement.dataset.tema; else document.documentElement.dataset.tema = id; };
+  if (!FONDOS.some((f) => f.id === fondoActual)) fondoActual = "bliss";
+  if (!TEMAS.some((t) => t.id === temaActual)) temaActual = "luna";
+  aplicarFondo(fondoActual);
+  aplicarTema(temaActual);
+
+  const PROTECTORES = [
+    { id: "dosi", nombre: "Dosi rebotando" },
+    { id: "ninguno", nombre: "(Ninguno)" },
+  ];
+  const ESPERAS = [
+    { id: "60", nombre: "1 minuto" },
+    { id: "120", nombre: "2 minutos" },
+    { id: "300", nombre: "5 minutos" },
+  ];
+  let protectorActual = guardado.leer("protector", "dosi");
+  let esperaActual = String(guardado.leer("espera", 120));
+  if (!PROTECTORES.some((x) => x.id === protectorActual)) protectorActual = "dosi";
+  if (!ESPERAS.some((x) => x.id === esperaActual)) esperaActual = "120";
+
+  // posiciona una ventana nueva (ya agregada al DOM) en el centro del escritorio
+  function centrarVentana(v, el, ancho) {
+    const a = area();
+    const w = Math.min(ancho, a.w - 24);
+    el.style.width = w + "px";
+    const h = el.offsetHeight;
+    setRect(v, clampRect(v, { x: a.x + (a.w - w) / 2 + (Math.random() * 60 - 30), y: a.y + Math.max(8, (a.h - h) / 3), w, h }));
+  }
+
+  let vProp = null;
+  function abrirPropiedades() {
+    if (vProp && !vProp.cerrada && document.body.contains(vProp.el)) { enfocar(vProp); return; }
+    const original = { fondo: fondoActual, tema: temaActual, protector: protectorActual, espera: esperaActual };
+    let aceptado = false;
+
+    const el = document.createElement("section");
+    el.className = "ventana dialogo propiedades inactiva";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Propiedades de pantalla");
+    const opciones = (lista, actual, grupo) => lista.map((o) =>
+      `<button class="opcion" type="button" role="radio" data-grupo="${grupo}" data-id="${o.id}" aria-checked="${o.id === actual}">${o.nombre}</button>`).join("");
+    el.innerHTML = `
+      <div class="titulo">
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <span class="titulo-txt">Propiedades de pantalla</span>
+        <span class="rayas" aria-hidden="true"></span>
+        <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+      </div>
+      <div class="prop-cuerpo">
+        <div class="vista" data-fondo="${fondoActual}" aria-hidden="true"><i class="vista-colina"></i></div>
+        <fieldset><legend>Fondo de escritorio</legend><div class="opciones" role="radiogroup" aria-label="Fondo de escritorio">${opciones(FONDOS, fondoActual, "fondo")}</div></fieldset>
+        <fieldset><legend>Combinación de colores</legend><div class="opciones" role="radiogroup" aria-label="Combinación de colores">${opciones(TEMAS, temaActual, "tema")}</div></fieldset>
+        <fieldset><legend>Protector de pantalla</legend>
+          <div class="opciones" role="radiogroup" aria-label="Protector de pantalla">${opciones(PROTECTORES, protectorActual, "protector")}</div>
+          <div class="opciones horizontal" role="radiogroup" aria-label="Esperar">${opciones(ESPERAS, esperaActual, "espera")}</div>
+          <button class="btn-xp vista-previa" type="button" data-vista>Vista previa</button>
+        </fieldset>
+      </div>
+      <div class="dialogo-pie"><button class="btn-xp" type="button" data-ok>Aceptar</button><button class="btn-xp" type="button" data-accion="cerrar">Cancelar</button></div>`;
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+
+    const v = crearVentana(el, {
+      titulo: "Propiedades de pantalla", autoAlto: true, minW: 300,
+      alCerrar: () => {
+        if (!aceptado) {
+          fondoActual = original.fondo; temaActual = original.tema; protectorActual = original.protector; esperaActual = original.espera;
+          aplicarFondo(fondoActual); aplicarTema(temaActual);
+        }
+      },
+    });
+    vProp = v;
+    centrarVentana(v, el, 430);
+    enfocar(v);
+    sonar("ding");
+
+    el.querySelectorAll(".opcion").forEach((b) => b.addEventListener("click", () => {
+      el.querySelectorAll(`.opcion[data-grupo="${b.dataset.grupo}"]`).forEach((x) => x.setAttribute("aria-checked", String(x === b)));
+      const g = b.dataset.grupo;
+      if (g === "fondo") { fondoActual = b.dataset.id; aplicarFondo(fondoActual); el.querySelector(".vista").dataset.fondo = fondoActual; }
+      else if (g === "tema") { temaActual = b.dataset.id; aplicarTema(temaActual); }
+      else if (g === "protector") protectorActual = b.dataset.id;
+      else if (g === "espera") esperaActual = b.dataset.id;
+      sonar("clic");
+    }));
+    el.querySelector("[data-vista]").addEventListener("click", () => activarProtector(true));
+    el.querySelector("[data-ok]").addEventListener("click", () => {
+      aceptado = true;
+      guardado.poner("fondo", fondoActual);
+      guardado.poner("tema", temaActual);
+      guardado.poner("protector", protectorActual);
+      guardado.poner("espera", Number(esperaActual));
+      const nombre = FONDOS.find((f) => f.id === fondoActual)?.nombre;
+      cerrar(v);
+      decir(`¡Me encanta! "${nombre}" te queda genial.`);
+    });
+    el.querySelector(".opcion[aria-checked='true']")?.focus();
+  }
+  $("menu-prop").addEventListener("click", () => { abrirMenu(false); sonar("menu"); abrirPropiedades(); });
+
+  /* ════════════════════════════════════════════════════════════════
+     SONIDO DE TECLADO + PANTALLA AZUL
+     ════════════════════════════════════════════════════════════════ */
+  let ultimaTecla = 0;
+  $("pregunta").addEventListener("keydown", (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.startsWith("Arrow") || ["Shift", "Control", "Alt", "Tab", "Escape", "CapsLock"].includes(e.key)) return;
+    const t = performance.now();
+    if (t - ultimaTecla < 35) return;
+    ultimaTecla = t;
+    sonar("tecla");
+  });
+
+  let fallosRed = 0;
+  function pantallaAzul() {
+    audio();
+    sonar("error");
+    const b = $("bsod");
+    b.hidden = false;
+    b.focus();
+  }
+  function cerrarPantallaAzul() {
+    const b = $("bsod");
+    if (b.hidden) return;
+    b.hidden = true;
+    fallosRed = 0;
+    $("pregunta").focus();
+    decir("Uf, qué susto. Cuando el servidor vuelva, preguntame de nuevo.", { estadoFinal: "error" });
+  }
+  $("bsod").addEventListener("keydown", (e) => { e.preventDefault(); cerrarPantallaAzul(); });
+  $("bsod").addEventListener("click", cerrarPantallaAzul);
+
+  /* ════════════════════════════════════════════════════════════════
+     PAPELERA DE RECICLAJE  ·  cada consulta hecha queda acá (por usuario)
+     ════════════════════════════════════════════════════════════════ */
+  let usuarioId = null;
+  let historial = [];
+  let refrescarPapelera = null;
+  const claveHist = () => "hist-" + (usuarioId || "dosi");
+  const fechaCorta = (t) => { const d = new Date(t); return `${p2(d.getDate())}/${p2(d.getMonth() + 1)}/${d.getFullYear()} ${p2(d.getHours())}:${p2(d.getMinutes())}`; };
+  function pintarPapelera() { document.querySelector(".icono-img.papelera").classList.toggle("llena", historial.length > 0); refrescarPapelera?.(); }
+  function cargarHistorial() { historial = guardado.leer(claveHist(), []); pintarPapelera(); }
+  function guardarConsulta(q, n) {
+    historial.unshift({ q, t: Date.now(), n });
+    historial = historial.slice(0, 50);
+    guardado.poner(claveHist(), historial);
+    pintarPapelera();
+  }
+
+  let vPap = null;
+  function abrirPapelera() {
+    if (vPap && !vPap.cerrada && document.body.contains(vPap.el)) { enfocar(vPap); return; }
+    const el = document.createElement("section");
+    el.className = "ventana dialogo papelera-win inactiva";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Papelera de reciclaje");
+    el.innerHTML = `
+      <div class="titulo">
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <span class="titulo-txt">Papelera de reciclaje</span>
+        <span class="rayas" aria-hidden="true"></span>
+        <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+      </div>
+      <div class="pap-cuerpo">
+        <div class="pap-barra"><button class="btn-xp" type="button" data-restaurar disabled>Restaurar</button><button class="btn-xp" type="button" data-vaciar>Vaciar la Papelera</button></div>
+        <div class="lista">
+          <div class="lista-cab pap-fila" aria-hidden="true"><span>Consulta</span><span>Fecha</span><span>Fuentes</span></div>
+          <ol class="pap-items" role="listbox" aria-label="Consultas en la Papelera"></ol>
+        </div>
+        <p class="pap-estado" role="status"></p>
+      </div>`;
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+
+    let sel = -1;
+    const ol = el.querySelector(".pap-items");
+    const estadoEl = el.querySelector(".pap-estado");
+    const bRestaurar = el.querySelector("[data-restaurar]");
+    const bVaciar = el.querySelector("[data-vaciar]");
+
+    const restaurar = (i) => {
+      const h = historial[i];
+      if (!h) return;
+      historial.splice(i, 1);
+      guardado.poner(claveHist(), historial);
+      pintarPapelera();
+      $("pregunta").value = h.q;
+      cerrar(v);
+      abrir(vApp);
+      $("pregunta").focus();
+      decir("Listo, recuperé tu consulta de la Papelera. ¿La mandamos de nuevo?");
+    };
+    const dibujar = (foco = false) => {
+      ol.innerHTML = "";
+      historial.forEach((h, i) => {
+        const li = document.createElement("li");
+        li.className = "pap-fila" + (i === sel ? " sel" : "");
+        li.tabIndex = 0;
+        li.setAttribute("role", "option");
+        li.setAttribute("aria-selected", String(i === sel));
+        const a = document.createElement("span"); a.className = "pap-nombre"; a.textContent = h.q;
+        const b = document.createElement("span"); b.textContent = fechaCorta(h.t);
+        const c = document.createElement("span"); c.textContent = String(h.n);
+        li.append(a, b, c);
+        li.addEventListener("click", () => { sel = i; dibujar(true); });
+        li.addEventListener("dblclick", () => restaurar(i));
+        li.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); restaurar(i); }
+          else if (e.key === "ArrowDown" && i < historial.length - 1) { e.preventDefault(); sel = i + 1; dibujar(true); }
+          else if (e.key === "ArrowUp" && i > 0) { e.preventDefault(); sel = i - 1; dibujar(true); }
+        });
+        ol.appendChild(li);
+      });
+      if (foco && sel >= 0) ol.children[sel]?.focus();
+      estadoEl.textContent = historial.length ? `${historial.length} ${historial.length === 1 ? "elemento" : "elementos"}` : "La Papelera está vacía.";
+      bRestaurar.disabled = sel < 0;
+      bVaciar.disabled = !historial.length;
+    };
+    bRestaurar.addEventListener("click", () => restaurar(sel));
+    bVaciar.addEventListener("click", () => dialogo({
+      titulo: "Confirmar eliminación de varios elementos",
+      icono: "pregunta",
+      texto: `¿Está seguro de que desea eliminar de forma permanente estos ${historial.length} elementos?`,
+      botones: [
+        { t: "Sí", principal: true, on: () => {
+          historial = []; sel = -1;
+          guardado.poner(claveHist(), historial);
+          pintarPapelera();
+          sonar("vaciar");
+          decir("¡Papelera vacía! Quedó todo limpito.");
+        } },
+        { t: "No" },
+      ],
+    }));
+
+    const v = crearVentana(el, { titulo: "Papelera de reciclaje", autoAlto: true, minW: 300, alCerrar: () => { refrescarPapelera = null; } });
+    vPap = v;
+    refrescarPapelera = () => { if (document.body.contains(el)) { sel = -1; dibujar(); } };
+    dibujar();
+    centrarVentana(v, el, 540);
+    enfocar(v);
+    sonar("ding");
+  }
+
+  /* ════════════════════════════════════════════════════════════════
+     ADMINISTRADOR DE TAREAS  ·  Ctrl + Alt + T, clic derecho en la barra o menú Inicio
+     (Ctrl + Alt + Supr lo reserva el sistema operativo; el navegador no lo recibe)
+     ════════════════════════════════════════════════════════════════ */
+  let vTM = null;
+  let idVentana = 0;
+  function abrirTareas() {
+    if (vTM && !vTM.cerrada && document.body.contains(vTM.el)) { enfocar(vTM); return; }
+    const el = document.createElement("section");
+    el.className = "ventana dialogo tm-win inactiva";
+    el.setAttribute("role", "dialog");
+    el.setAttribute("aria-label", "Administrador de tareas");
+    el.innerHTML = `
+      <div class="titulo">
+        <button class="titulo-icono" type="button" data-accion="menu" aria-label="Menú de la ventana" aria-haspopup="menu">+</button>
+        <span class="titulo-txt">Administrador de tareas</span>
+        <span class="rayas" aria-hidden="true"></span>
+        <button class="btn-ventana cerrar" type="button" data-accion="cerrar" aria-label="Cerrar"><svg viewBox="0 0 12 12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg></button>
+      </div>
+      <div class="tm-cuerpo">
+        <div class="tm-tabs" role="tablist">
+          <button class="tm-tab" type="button" role="tab" aria-selected="true" data-tab="apps">Aplicaciones</button>
+          <button class="tm-tab" type="button" role="tab" aria-selected="false" data-tab="procs">Procesos</button>
+        </div>
+        <div class="tm-panel"><div class="lista"><div class="lista-cab tm-fila" aria-hidden="true"></div><ol class="tm-items" role="listbox" aria-label="Lista"></ol></div></div>
+        <div class="tm-botones"><button class="btn-xp" type="button" data-fin disabled>Finalizar tarea</button><button class="btn-xp" type="button" data-cambiar disabled>Cambiar a</button></div>
+      </div>
+      <div class="estado"><span data-n></span><span data-cpu></span></div>`;
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+
+    let pestana = "apps", selKey = null, firma = "";
+    const cab = el.querySelector(".lista-cab"), ol = el.querySelector(".tm-items");
+    const bFin = el.querySelector("[data-fin]"), bCamb = el.querySelector("[data-cambiar]");
+    const jitter = (a, b) => a + Math.random() * (b - a);
+
+    function filas() {
+      if (pestana === "apps") {
+        return {
+          cols: ["1fr 120px", ["Tarea", "Estado"]],
+          rows: gestor.lista.filter((x) => !x.cerrada && x !== vTM && x.o.titulo)
+            .map((x) => { x._id ||= ++idVentana; return { key: "w" + x._id, ref: x, celdas: [x.o.titulo, x.min ? "Minimizada" : "En ejecución"] }; }),
+          cpu: 0,
+        };
+      }
+      const e = svg.dataset.estado;
+      const cDosi = e === "hablando" ? jitter(40, 90) : e === "pensando" ? jitter(20, 50) : jitter(0, 2);
+      const srv = servidorOk === true ? "En ejecución" : servidorOk === false ? "Sin respuesta" : "Sin comprobar";
+      const cSrv = servidorOk === true ? jitter(0, 3) : 0;
+      const cEdge = jitter(1, 4);
+      const procs = [
+        { id: "dosi", n: "dosi.exe", est: dormida ? "Durmiendo" : "En ejecución", cpu: cDosi, mem: "18.432 KB" },
+        { id: "srv", n: "servidor.mjs (node.exe)", est: srv, cpu: cSrv, mem: "54.120 KB" },
+        { id: "pg", n: "postgres.exe (rag-db)", est: srv, cpu: cSrv, mem: "31.744 KB" },
+        { id: "ollama", n: "ollama.exe (bge-m3)", est: "Sin comprobar", cpu: 0, mem: "—" },
+        { id: "edge", n: "msedge.exe", est: "En ejecución", cpu: cEdge, mem: "212.808 KB" },
+      ];
+      return {
+        cols: ["1.4fr 110px 52px 90px", ["Nombre de imagen", "Estado", "CPU", "Memoria"]],
+        rows: procs.map((p) => ({ key: "p" + p.id, id: p.id, nombre: p.n, celdas: [p.n, p.est, String(Math.round(p.cpu)).padStart(2, "0"), p.mem] })),
+        cpu: procs.reduce((a, p) => a + p.cpu, 0),
+      };
+    }
+    function dibujar() {
+      const f = filas();
+      el.style.setProperty("--cols", f.cols[0]);
+      if (cab.dataset.p !== pestana) { cab.innerHTML = f.cols[1].map((t) => `<span>${t}</span>`).join(""); cab.dataset.p = pestana; }
+      const nueva = pestana + "|" + f.rows.map((r) => r.key).join(",");
+      if (nueva !== firma) {
+        firma = nueva;
+        ol.innerHTML = "";
+        f.rows.forEach((r) => {
+          const li = document.createElement("li");
+          li.className = "tm-fila"; li.dataset.k = r.key; li.tabIndex = 0;
+          li.setAttribute("role", "option");
+          r.celdas.forEach(() => li.appendChild(document.createElement("span")));
+          li.addEventListener("click", () => { selKey = r.key; marcar(); });
+          ol.appendChild(li);
+        });
+      }
+      [...ol.children].forEach((li, i) => { [...li.children].forEach((sp, k) => { const t = f.rows[i].celdas[k]; if (sp.textContent !== t) sp.textContent = t; }); });
+      el._filas = f.rows;
+      marcar();
+      el.querySelector("[data-n]").textContent = pestana === "apps" ? `Aplicaciones: ${f.rows.length}` : `Procesos: ${f.rows.length}`;
+      el.querySelector("[data-cpu]").textContent = pestana === "procs" ? `Uso de CPU: ${Math.round(f.cpu)}%` : "";
+    }
+    function marcar() {
+      [...ol.children].forEach((li) => { const s = li.dataset.k === selKey; li.classList.toggle("sel", s); li.setAttribute("aria-selected", String(s)); });
+      const hay = (el._filas || []).some((r) => r.key === selKey);
+      bFin.disabled = !hay;
+      bCamb.disabled = !hay || pestana !== "apps";
+    }
+    function fila() { return (el._filas || []).find((r) => r.key === selKey); }
+    function ponerPestana(t) {
+      pestana = t; selKey = null; firma = "";
+      el.querySelectorAll(".tm-tab").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+      bFin.textContent = t === "apps" ? "Finalizar tarea" : "Finalizar proceso";
+      bCamb.hidden = t !== "apps";
+      dibujar();
+    }
+    el.querySelectorAll(".tm-tab").forEach((b) => b.addEventListener("click", () => { sonar("clic"); ponerPestana(b.dataset.tab); }));
+    bCamb.addEventListener("click", () => { const r = fila(); if (r?.ref) abrir(r.ref); });
+    bFin.addEventListener("click", () => {
+      const r = fila();
+      if (!r) return;
+      if (pestana === "apps") { cerrar(r.ref); selKey = null; dibujar(); return; }
+      if (r.id === "dosi") { finalizarDosi(); return; }
+      dialogo({ titulo: "Administrador de tareas", icono: "error", texto: `No se puede finalizar el proceso "${r.nombre}".\n\nAcceso denegado.` });
+    });
+
+    const timer = setInterval(dibujar, 1000);
+    const v = crearVentana(el, { titulo: "Administrador de tareas", autoAlto: true, minW: 300, alCerrar: () => clearInterval(timer) });
+    vTM = v;
+    dibujar();
+    centrarVentana(v, el, 500);
+    enfocar(v);
+    sonar("ding");
+  }
+
+  function finalizarDosi() {
+    asis.style.visibility = "hidden";
+    sonar("error");
+    setTimeout(() => {
+      asis.style.visibility = "";
+      tv("despierta");
+      tvTimer = setTimeout(() => tv(""), 650);
+      decir("¡Volví! A mí no me finalizás tan fácil: soy un proceso muy importante.");
+    }, 3500);
+  }
+
+  // clic derecho en la barra de tareas y atajo de teclado
+  document.addEventListener("contextmenu", (e) => {
+    if (!e.target.closest(".barra-tareas") || e.target.closest(".inicio")) return;
+    e.preventDefault();
+    audio();
+    abrirMenu(false);
+    anclaMenu = null;
+    abrirPopup(menuCtx, e.clientX, e.clientY, [
+      { t: "Administrador de tareas", on: abrirTareas, fuerte: true },
+      { sep: true },
+      { t: "Propiedades de pantalla", on: abrirPropiedades },
+    ]);
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.altKey && (e.code === "KeyT" || e.key === "Delete")) { e.preventDefault(); audio(); abrirTareas(); }
+  });
+
+  /* ════════════════════════════════════════════════════════════════
+     PROTECTOR DE PANTALLA  ·  Dosi rebota como el logo del DVD
+     ════════════════════════════════════════════════════════════════ */
+  const prot = $("protector");
+  const reb = $("rebote");
+  let protActivo = false, protRaf = 0, protIni = 0, protPos = null;
+
+  function activarProtector(vista = false) {
+    if (protActivo) return;
+    protActivo = true; protIni = performance.now(); protPos = null;
+    cerrarPopups(); abrirMenu(false);
+    prot.hidden = false;
+
+    const clon = svg.cloneNode(true);
+    clon.removeAttribute("id");
+    clon.dataset.estado = "idle"; clon.dataset.boca = "cerrada"; clon.dataset.travesura = ""; clon.dataset.mascota = "";
+    const cp = clon.querySelector("clipPath"), rec = clon.querySelector("[clip-path]");
+    if (cp && rec) { cp.id = "clip-barril-rebote"; rec.setAttribute("clip-path", "url(#clip-barril-rebote)"); }
+    const cont = reb.querySelector(".dosi");
+    cont.replaceChildren(clon);
+    const w = movil() ? 100 : 150, h = (w * 270) / 200;
+    cont.style.width = w + "px";
+    reb.style.filter = "";
+
+    let rebotes = 0, esquinas = 0, hue = 0;
+    const info = $("protector-info");
+    const pintarInfo = () => { info.textContent = `Rebotes: ${rebotes}   Esquinas: ${esquinas}`; };
+    pintarInfo();
+
+    let x = Math.random() * Math.max(1, innerWidth - w), y = Math.random() * Math.max(1, innerHeight - h);
+    if (sinMovimiento) {            // sin movimiento: Dosi queda quieto en el centro
+      reb.style.transform = `translate(${(innerWidth - w) / 2}px, ${(innerHeight - h) / 2}px)`;
+      return;
+    }
+    let vx = (Math.random() < 0.5 ? -1 : 1) * (170 + Math.random() * 70);
+    let vy = (Math.random() < 0.5 ? -1 : 1) * (130 + Math.random() * 60);
+    let ult = performance.now();
+
+    const paso = (t) => {
+      const dt = Math.min(0.05, (t - ult) / 1000);
+      ult = t;
+      x += vx * dt; y += vy * dt;
+      const maxX = innerWidth - w, maxY = innerHeight - h;
+      let rx = false, ry = false;
+      if (x <= 0) { x = 0; vx = Math.abs(vx); rx = true; } else if (x >= maxX) { x = maxX; vx = -Math.abs(vx); rx = true; }
+      if (y <= 0) { y = 0; vy = Math.abs(vy); ry = true; } else if (y >= maxY) { y = maxY; vy = -Math.abs(vy); ry = true; }
+      if (rx || ry) {
+        rebotes++;
+        hue = (hue + 55 + Math.random() * 80) % 360;
+        reb.style.filter = `hue-rotate(${hue}deg)`;
+        const cercaX = x < 14 || x > maxX - 14, cercaY = y < 14 || y > maxY - 14;
+        if (cercaX && cercaY) {          // ¡esquina!
+          esquinas++;
+          const f = document.createElement("div");
+          f.className = "protector-flash"; f.textContent = "¡ESQUINA!";
+          prot.appendChild(f);
+          setTimeout(() => f.remove(), 1500);
+          sonar("ding");
+        }
+        pintarInfo();
+      }
+      reb.style.transform = `translate(${x}px, ${y}px)`;
+      protRaf = requestAnimationFrame(paso);
+    };
+    protRaf = requestAnimationFrame(paso);
+  }
+  function desactivarProtector() {
+    if (!protActivo) return;
+    protActivo = false;
+    cancelAnimationFrame(protRaf);
+    prot.hidden = true;
+    prot.querySelectorAll(".protector-flash").forEach((f) => f.remove());
+    ultimaActividad = performance.now();
+  }
+  ["pointermove", "pointerdown", "keydown", "wheel", "touchstart"].forEach((n) => addEventListener(n, (e) => {
+    if (!protActivo || performance.now() - protIni < 500) return;
+    if (n === "pointermove") {              // un temblor del mouse no lo despierta
+      if (!protPos) { protPos = [e.clientX, e.clientY]; return; }
+      if (Math.hypot(e.clientX - protPos[0], e.clientY - protPos[1]) < 8) return;
+    }
+    desactivarProtector();
+  }, { passive: true }));
+  setInterval(() => {
+    if (protActivo || protectorActual === "ninguno" || sinMovimiento || document.hidden) return;
+    if (!bienvenida.hidden || !$("bsod").hidden) return;
+    if (saltar || globo.classList.contains("pensando") || $("btn-enviar").disabled) return;
+    if (performance.now() - ultimaActividad > Number(esperaActual) * 1000) activarProtector();
+  }, 1000);
+
+  /* ════════════════════════════════════════════════════════════════
+     LOGIN, CAMBIAR DE USUARIO Y CERRAR SESIÓN
+     ════════════════════════════════════════════════════════════════ */
+  const USUARIOS = {
+    dosi:     { nombre: "Dosi", img: null, rol: "Consultor de vacunas" },
+    alan:     { nombre: "Alan Acevedo", img: "imgs/avatares/alan.jpg", rol: "Usuario" },
+    agustina: { nombre: "Agustina Di Pasquale", img: "imgs/avatares/agustina.png", pixel: true, rol: "Usuario" },
+    ilan:     { nombre: "Ilan Pitashny", img: "imgs/avatares/ilan.jpg", rol: "Usuario" },
+  };
+  const bienvenida = $("bienvenida");
+  let entro = false;
+
+  function mostrarLogin() {
+    entro = false;
+    detenerHabla();
+    document.querySelectorAll("[data-usuario]").forEach((b) => {
+      const actual = b.dataset.usuario === usuarioId;
+      b.classList.toggle("actual", actual);
+      b.querySelector("small").textContent = actual ? "Sesión iniciada" : USUARIOS[b.dataset.usuario].rol;
+    });
+    bienvenida.hidden = false;
+    bienvenida.classList.add("saliendo");
+    requestAnimationFrame(() => requestAnimationFrame(() => bienvenida.classList.remove("saliendo")));
+    (document.querySelector(`[data-usuario="${usuarioId || guardado.leer("usuario", "dosi")}"]`) || document.querySelector("[data-usuario]")).focus();
+  }
+  function detenerHabla() { turno++; saltar = null; parar(); boca(false); estado("idle"); }
+
+  function entrar(id) {
+    const u = USUARIOS[id];
+    if (entro || !u) return;
+    entro = true;
+    const mismo = id === usuarioId;
+    usuarioId = id;
+    guardado.poner("usuario", id);
+    audio();
+    sonar("inicio");
+
+    $("menu-nombre").textContent = u.nombre;
+    $("menu-avatar").innerHTML = u.img ? `<img class="${u.pixel ? "pixel" : ""}" src="${u.img}" alt="" />` : "D+";
+    cargarHistorial();
+
+    bienvenida.classList.add("saliendo");
+    if (!vApp.cerrada && !vApp.min) enfocar(vApp);
+    setTimeout(() => {
+      bienvenida.hidden = true;
+      if (mismo) return;
+      const saludo = id === "dosi" ? "¡Hola! Soy Dosi." : `¡Hola, ${u.nombre.split(" ")[0]}! Soy Dosi.`;
+      decir(`${saludo} Preguntame lo que quieras sobre el Calendario Nacional de Vacunación de Argentina, o sobre las vacunas de perros y gatos. Te respondo con fuentes oficiales.`);
+      setTimeout(comprobarServidor, 1800);
+    }, sinMovimiento ? 0 : 900);
+  }
+  document.querySelectorAll("[data-usuario]").forEach((b) => b.addEventListener("click", () => entrar(b.dataset.usuario)));
+
+  function cambiarUsuario() {
+    sonar("apagado");
+    cerrarPopups(); abrirMenu(false); desactivarProtector();
+    mostrarLogin();
+  }
+  function cerrarSesion() {
+    sonar("apagado");
+    for (const v of [...gestor.lista]) if (v.o.autoAlto) cerrar(v);       // cierra los diálogos
+    if (vApp.cerrada) { vApp.cerrada = false; vApp.el.classList.remove("cerrada"); if (vApp.boton) vApp.boton.hidden = false; }
+    if (vApp.min) { vApp.min = false; vApp.el.classList.remove("minimizada"); }
+    $("pregunta").value = "";
+    $("fuentes-card").classList.remove("visible");
+    globo.hidden = true; ultimoMensaje = ""; texto.replaceChildren();
+    svg.dataset.mascota = "";
+    $("aviso").hidden = true;
+    cerrarPopups(); abrirMenu(false); desactivarProtector();
+    mostrarLogin();
+  }
+  $("menu-logoff").addEventListener("click", () => {
+    abrirMenu(false);
+    sonar("menu");
+    dialogo({
+      titulo: "Cerrar sesión de DOMUS+",
+      icono: "pregunta",
+      texto: "¿Qué querés hacer?",
+      botones: [
+        { t: "Cambiar de usuario", on: cambiarUsuario },
+        { t: "Cerrar sesión", principal: true, on: cerrarSesion },
+        { t: "Cancelar" },
+      ],
+    });
+  });
+
+  // primer arranque: foco en el último usuario que entró
+  mostrarLogin();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { rag } from "./rag.mjs";
+import { consultar } from "./db.mjs";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT ?? 3000;
@@ -16,6 +17,12 @@ const MIME = {
   ".js": "application/javascript",
   ".png": "image/png",
   ".ico": "image/x-icon",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".svg": "image/svg+xml",
+  ".wav": "audio/wav",
+  ".mp3": "audio/mpeg",
+  ".ogg": "audio/ogg",
 };
 
 const server = http.createServer(async (req, res) => {
@@ -25,6 +32,19 @@ const server = http.createServer(async (req, res) => {
   if (req.method === "OPTIONS") {
     res.writeHead(204);
     res.end();
+    return;
+  }
+
+  // ─── API: GET /salud (¿responde la base de datos?) ───────────────────────
+  if (req.method === "GET" && req.url === "/salud") {
+    try {
+      await consultar("SELECT 1");
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: true }));
+    } catch (err) {
+      res.writeHead(503, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: false, error: err.message }));
+    }
     return;
   }
 
@@ -54,7 +74,8 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ─── Archivos estáticos ──────────────────────────────────────────────────
-  let ruta = req.url === "/" ? "/index.html" : req.url;
+  let ruta = req.url === "/" ? "/index.html" : req.url.split("?")[0];
+  try { ruta = decodeURIComponent(ruta); } catch { res.writeHead(400); res.end("URL inválida"); return; }
   // Seguridad: evitar path traversal
   if (ruta.includes("..")) {
     res.writeHead(403);

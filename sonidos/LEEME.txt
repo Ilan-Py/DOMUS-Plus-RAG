@@ -1,0 +1,26 @@
+SONIDOS DE WINDOWS XP
+=====================
+Copia aca tus archivos de sonido con ESTOS nombres (.wav, .mp3 u .ogg).
+Si falta alguno, la pagina usa un sonido sintetico de reemplazo.
+
+  nombre aqui        sonido original de Windows XP (carpeta C:\WINDOWS\Media)
+  -----------------  ------------------------------------------------------
+  inicio             Windows XP Startup.wav            (al entrar a la pagina)
+  ding               Windows XP Ding.wav               (mensaje informativo)
+  error              Windows XP Error.wav              (cuadro de error)
+  exclamacion        Windows XP Exclamation.wav        (aviso)
+  globo              Windows XP Balloon.wav            (aparece el globo de Dosi)
+  minimizar          Windows XP Minimize.wav
+  restaurar          Windows XP Restore.wav            (restaurar y maximizar)
+  menu               Windows XP Menu Command.wav       (clic en el menu Inicio)
+  clic               Windows XP Start.wav              (boton inicio / sonido)
+  notificacion       Windows XP Notify.wav             (llegaron las fuentes)
+  tecla              (opcional) un click de teclado muy corto, al escribir
+
+Los nombres exactos pueden variar segun la version; lo importante es que
+el archivo se llame como la columna de la izquierda.
+Nota: abri la pagina desde http://localhost:3000 (npm start). Con doble clic
+sobre index.html el navegador bloquea la carga de audios y se usan los sinteticos.
+
+Tambien se aceptan los nombres originales de XP tal cual (por ejemplo
+"Windows XP Ding.mp3", "startup.mp3", "notify.mp3"). Si existen ambos, gana el nombre corto.
